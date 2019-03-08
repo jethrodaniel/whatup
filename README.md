@@ -2,6 +2,8 @@
 
 whatup is a simple server-based instant messaging application
 
+**Note**: this is very much a work-in-progress, and will be until version `1.0.0`
+
 ## Installation
 
 ```
