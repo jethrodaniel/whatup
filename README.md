@@ -14,8 +14,10 @@ gem install whatup
 $ whatup
 
 Commands:
+  whatup client ...      # Perform client commands
   whatup hello           # Says hello
   whatup help [COMMAND]  # Describe available commands or one specific command
+  whatup server ...      # Perform server commands
 ```
 
 ## Development
