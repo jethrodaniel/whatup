@@ -20,8 +20,16 @@ Commands:
 
 ## Development
 
+To run the program's command line interface
+
 ```
 ruby -I./lib ./exe/whatup
+```
+
+To run the tests
+
+```
+bundle exec rspec
 ```
 
 ## Contributing

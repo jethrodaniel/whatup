@@ -42,7 +42,7 @@ Gem::Specification.new do |spec|
   {
     'pry' => '~> 0.12.2',
     'bundler' => '~> 2.0',
-    'rake' => '~> 10.0',
+    'rake' => '~> 12.3.2',
     'rspec' => '~> 3.8',
     'thor' => '~> 0.20.3',
     'yard' => '~> 0.9.18'
