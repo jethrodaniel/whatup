@@ -5,4 +5,4 @@ require 'whatup/cli'
 
 require 'thor'
 
-CLI.start ARGV
+Whatup::CLI.start ARGV
