@@ -7,7 +7,7 @@ whatup is a simple server-based instant messaging application
 ## Installation
 
 ```
-gem install whatup
+$ gem install whatup
 ```
 
 ## Usage
@@ -27,13 +27,13 @@ Commands:
 To run the program's command line interface
 
 ```
-ruby -I./lib ./exe/whatup
+$ ruby -I./lib ./exe/whatup
 ```
 
 To run the tests
 
 ```
-bundle exec rspec
+$ bundle exec rspec
 ```
 
 ## Contributing
