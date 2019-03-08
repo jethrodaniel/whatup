@@ -43,7 +43,8 @@ Gem::Specification.new do |spec|
     'pry'     => '~> 0.12.2',
     'bundler' => '~> 2.0',
     'rake'    => '~> 10.0',
-    'rspec'   => '~> 3.8'
+    'rspec'   => '~> 3.8',
+    'thor'    => '~> 0.20.3'
   }.each do |gem, version|
     spec.add_development_dependency gem, version
   end
