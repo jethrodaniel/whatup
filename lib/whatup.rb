@@ -2,7 +2,9 @@
 
 require 'whatup/version'
 
+# Main module for whatup
 module Whatup
-  class Error < StandardError; end
-  # Your code goes here...
+  # Whatup-specific error class
+  class Error < StandardError
+  end
 end

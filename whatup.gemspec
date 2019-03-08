@@ -40,11 +40,12 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   {
-    'pry'     => '~> 0.12.2',
+    'pry' => '~> 0.12.2',
     'bundler' => '~> 2.0',
-    'rake'    => '~> 10.0',
-    'rspec'   => '~> 3.8',
-    'thor'    => '~> 0.20.3'
+    'rake' => '~> 10.0',
+    'rspec' => '~> 3.8',
+    'thor' => '~> 0.20.3',
+    'yard' => '~> 0.9.18'
   }.each do |gem, version|
     spec.add_development_dependency gem, version
   end
