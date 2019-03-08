@@ -4,7 +4,19 @@ whatup is a simple server-based instant messaging application
 
 ## Installation
 
+```
+gem install whatup
+```
+
 ## Usage
+
+```
+$ whatup
+
+Commands:
+  whatup hello           # Says hello
+  whatup help [COMMAND]  # Describe available commands or one specific command
+```
 
 ## Development
 
