@@ -21,10 +21,3 @@ To install Ruby
 ```
 $ rbenv install 2.6.1
 ```
-
-Then install [bundler](https://bundler.io/), which manages dependencies. It's
-like [Gradle](https://gradle.org/) or [Make](https://www.gnu.org/software/make/).
-
-```
-$ gem install bundler
-```
