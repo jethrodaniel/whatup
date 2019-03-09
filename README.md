@@ -6,9 +6,14 @@ whatup is a simple server-based instant messaging application
 
 ## Installation
 
+Assuming you have Ruby `2.6.1` installed,
+
 ```
 $ gem install whatup
 ```
+
+If you don't have Ruby `2.6.1` installed, see [here](docs/installing_ruby.md)
+for some brief instructions.
 
 ## Usage
 
