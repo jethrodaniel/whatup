@@ -42,6 +42,18 @@ $ whatup server
 Commands:
   whatup server help [COMMAND]  # Describe subcommands or one specific subcommand
   whatup server start           # Starts a server instance
+
+$ whatup server help start
+
+Usage:
+  whatup server start
+
+Options:
+  [--port=N]
+              # Default: 9001
+
+Description:
+  Starts a server instance on the specified port.
 ```
 
 ## Client
@@ -54,4 +66,16 @@ $ whatup client
 Commands:
   whatup client help [COMMAND]  # Describe subcommands or one specific subcommand
   whatup client start           # Starts a client instance
+
+$ whatup client help start
+
+Usage:
+  whatup client start
+
+Options:
+  [--port=N]
+              # Default: 9001
+
+Description:
+  Starts a client instance sending requests to the specified port.
 ```
