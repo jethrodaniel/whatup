@@ -2,6 +2,9 @@
 
 require 'thor'
 
+require 'whatup/server'
+require 'whatup/client'
+
 module Whatup
   # Thor command classes for the cli.
   # For usage, see <http://whatisthor.com/>
@@ -13,9 +16,9 @@ module Whatup
         Starts a client instance sending requests to the specified port.
       DESC
       desc 'start', 'Starts a client instance'
-      # Starts a client instance
       def start
         say "starting a client ... \n", :green
+        Whatup::Client.new(port: options[:port]).start
       end
     end
 
@@ -26,16 +29,14 @@ module Whatup
       long_desc <<~DESC
         Starts a server instance on the specified port.
       DESC
-      # Starts a server instance
       def start
-        say "starting a server ... \n", :green
+        Whatup::Server.new(port: options[:port]).start
       end
     end
 
     # Top-level command class
     class CLI < Thor
       desc 'hello', 'Says hello'
-      # Says hello. This is a placeholder for some useful command.
       def hello
         say "Hello!\n", :cyan
       end

@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+# Ensures that before commiting:
+# - there are no rubocop style violations
+
+bundle exec rubocop

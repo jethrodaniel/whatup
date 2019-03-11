@@ -1,3 +1,44 @@
+# Rubocop linting options
+
+AllCops:
+  # Modern Ruby
+  TargetRubyVersion: 2.4
+
+# Gemspecs are just a giant block, anyway
 Metrics/BlockLength:
   Exclude:
     - 'whatup.gemspec'
+
+Metrics/MethodLength:
+  Max: 20 # 10 is a bit too low
+
+# Don't type unneccesary ()
+Style/MethodDefParentheses:
+  EnforcedStyle: require_no_parentheses
+
+# { } for blocks, {} for hashes
+Layout/SpaceInsideHashLiteralBraces:
+  EnforcedStyle: no_space
+
+# while line = gets do
+#   ...
+# end
+Lint/AssignmentInCondition:
+  Enabled: false
+
+# I argue that the following is cleaner than an if-else in some cases:
+#
+# outcome = some_really_long_event \
+#   ? choice_a
+#   : choice_a
+Style/MultilineTernaryOperator:
+  Enabled: false
+
+# Encouraging a comment above every single module or class oftentimes leeds to
+# redundant comments that are odds with the design principle of writing
+# simple, readable code
+#
+# Though theses are certinly great for usage description, but often later in
+# development.
+Style/Documentation:
+  Enabled: false

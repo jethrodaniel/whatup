@@ -41,6 +41,14 @@ To run the tests
 $ bundle exec rspec
 ```
 
+We have a git hook to automatically run the code linter before committing.
+
+Set it up as follows
+
+```
+$ git config core.hooksPath '.git_hooks'
+```
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at <https://github.com/jethrodaniel/whatup>.

@@ -41,12 +41,20 @@ Gem::Specification.new do |spec|
 
   {
     'pry' => '~> 0.12.2',
+    'pry-byebug' => '~> 3.7',
     'bundler' => '~> 2.0',
     'rake' => '~> 12.3.2',
     'rspec' => '~> 3.8',
     'thor' => '~> 0.20.3',
-    'yard' => '~> 0.9.18'
+    'yard' => '~> 0.9.18',
+    'rubocop' => '~> 0.65.0'
   }.each do |gem, version|
     spec.add_development_dependency gem, version
+  end
+
+  {
+    'thor' => '~> 0.20.3'
+  }.each do |gem, version|
+    spec.add_dependency gem, version
   end
 end
