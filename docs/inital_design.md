@@ -9,7 +9,7 @@ programming language, similar to Python.
 
 ## Packaging, Installation
 
-It is packaged as a [gem](https://guides.rubygems.org/), which is idiomatic Ruby way to publish code.
+It is packaged as a [gem](https://guides.rubygems.org/), which is the idiomatic Ruby way to publish code.
 
 This allows for a very simple setup (as follows):
 
