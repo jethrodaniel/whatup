@@ -6,7 +6,7 @@ module Whatup
   class Client
     include Thor::Shell
 
-    def initialize ip: 'localhost', port: 9_001
+    def initialize ip:, port:
       @dest = {
         ip: ip,
         port: port,
@@ -14,7 +14,7 @@ module Whatup
       }
     end
 
-    def start
+    def connect
       say "Connecting to #{@dest[:ip]}:#{@dest[:port]} ..."
 
       socket = TCPSocket.open @dest[:ip], @dest[:port]

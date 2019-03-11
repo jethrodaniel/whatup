@@ -11,14 +11,14 @@ module Whatup
   module CLI
     # Client commands
     class Client < Thor
+      option :ip, type: :string, default: 'localhost'
       option :port, type: :numeric, default: 9_001
       long_desc <<~DESC
-        Starts a client instance sending requests to the specified port.
+        Starts a client instance sending requests to the specified ip and port.
       DESC
-      desc 'start', 'Starts a client instance'
-      def start
-        say "starting a client ... \n", :green
-        Whatup::Client.new(port: options[:port]).start
+      desc 'connect', 'Connects a new client instance to a server'
+      def connect
+        Whatup::Client.new(ip: options[:ip], port: options[:port]).connect
       end
     end
 
@@ -27,7 +27,7 @@ module Whatup
       option :port, type: :numeric, default: 9_001
       desc 'start', 'Starts a server instance'
       long_desc <<~DESC
-        Starts a server instance on the specified port.
+        Starts a server instance running locally on the specified port.
       DESC
       def start
         Whatup::Server.new(port: options[:port]).start

@@ -7,8 +7,8 @@ module Whatup
   class Server
     include Thor::Shell
 
-    def initialize ip: 'localhost', port: 9_001
-      @ip = ip
+    def initialize port:
+      @ip = 'localhost'
       @port = port
       @address = "#{@ip}:#{@port}"
 
