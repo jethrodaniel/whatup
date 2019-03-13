@@ -45,7 +45,6 @@ Gem::Specification.new do |spec|
     'bundler' => '~> 2.0',
     'rake' => '~> 12.3.2',
     'rspec' => '~> 3.8',
-    'thor' => '~> 0.20.3',
     'yard' => '~> 0.9.18',
     'rubocop' => '~> 0.65.0'
   }.each do |gem, version|
