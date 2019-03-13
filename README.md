@@ -61,3 +61,9 @@ Free as in beer - our [license](https://github.com/jethrodaniel/whatup/blob/mast
 
 This was part of a school project - see the [course site](http://www.cs.memphis.edu/~kanyang/COMP3825-sp19.html) for details.
 
+## Citations
+
+The following were instrumental in understanding the usage of threads for socket input:
+
+- [Socket Programming in Ruby](https://code.likeagirl.io/socket-programming-in-ruby-f714131336fd),Chopra, Neha. Code Like A Girl. (19 Sept. 2017)
+- [Ruby TCP Chat](www.sitepoint.com/ruby-tcp-chat/), Benitez, Simon. Sitepoint. (13 Jan. 2014)

@@ -36,3 +36,7 @@ Style/MultilineTernaryOperator:
 # simple, readable code
 Style/Documentation:
   Enabled: false
+
+# [a, b, c].map &:to_f
+Lint/AmbiguousOperator:
+  Enabled: false

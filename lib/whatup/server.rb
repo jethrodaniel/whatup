@@ -24,16 +24,30 @@ module Whatup
       connect_to_socket!
       write_pid!
 
-      client = @socket.accept
+      # Listen for connections, then accept each in a separate thread
       loop do
-        client.puts Time.now
-        sleep 1
+        Thread.new @socket.accept do |client|
+          handle_client client
+        end
       end
     rescue SignalException
       kill
     end
 
     private
+
+    def handle_client client
+      name = client.gets.chomp
+      puts "#{name} just showed up!"
+      client.puts "Hello, #{name}!"
+
+      client.puts 'Sending you the time ...'
+
+      loop do
+        client.puts Time.now
+        sleep 1
+      end
+    end
 
     def exit_if_pid_exists!
       return unless running?

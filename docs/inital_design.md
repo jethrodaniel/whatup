@@ -1,6 +1,6 @@
 # Inital Design
 
-whatup is a simple server-based instant messaging application ustilitzing TCP sockets.
+whatup is a simple server-based instant messaging application utilizing TCP sockets.
 
 ## Language
 
@@ -36,10 +36,10 @@ Commands:
 The server implements a basic TCP socket, and listens on port 9001 (or another
 optional port) for requests, which will be routed to TCP sockets.
 
-When the server recieves a client connection, it forks and assigns a unique id
-to the client by its IP address and a user provided name.
+When the server recieves a client connection, it starts a new thread and assigns a unique id
+to the client by a random number and a user provided name.
 
-Multiple clients can connect, since the server forks a process for each connection.
+Multiple clients can connect, since the server starts a new thread for each connection.
 
 ```
 $ whatup server
@@ -66,7 +66,7 @@ Description:
 A client connects to the server via one of the server's TCP sockets.
 
 When the client connects, it is asked to provide a username, which will be
-combined with its IP address to produce a unique identifier for the client.
+combined with a random number to produce a unique identifier for the client.
 
 The client, when connected, can ask the server for a list of other connected
 clients, and can then choose to chat with any other client.
