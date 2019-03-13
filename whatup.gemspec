@@ -14,6 +14,7 @@ Gem::Specification.new do |spec|
   # spec.description   = 'TODO: Write a longer description or delete this line.'
   spec.homepage      = 'https://github.com/jethrodaniel/whatup'
   spec.license       = 'MIT'
+  spec.required_ruby_version = '~> 2.4'
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the
   # 'allowed_push_host' to allow pushing to a single host or delete this
