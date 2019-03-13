@@ -78,7 +78,7 @@ Commands:
   whatup client connect         # Connects a new client instance to a server
   whatup client help [COMMAND]  # Describe subcommands or one specific subcommand
 
-$ whatup client help start
+$ whatup client help connect
 
 Usage:
   whatup client connect
