@@ -4,16 +4,18 @@ whatup is a simple server-based instant messaging application
 
 **Note**: this is very much a work-in-progress, and will be until version `1.0.0`
 
+Check it out on [rubygems.org](https://rubygems.org/gems/whatup).
+
 ## Installation
 
-Assuming you have Ruby `2.6.1` installed,
+Assuming you have Ruby 2.4 or greater installed,
 
 ```
 $ gem install whatup
 ```
 
-If you don't have Ruby `2.6.1` installed, see [here](docs/installing_ruby.md)
-for some brief instructions.
+If you don't have Ruby installed, see [here](docs/installing_ruby.md) for some
+brief instructions.
 
 ## Usage
 
