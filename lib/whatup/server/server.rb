@@ -57,9 +57,13 @@ module Whatup
           msg = client.gets&.chomp
           puts "#{client.name}> #{msg}" unless msg.nil? || msg == ''
 
-          @clients.reject { |c| c.id == client.id }.each do |c|
-            c.puts "\n#{client.name}> #{msg}" unless msg.nil? || msg == ''
-          end
+          broadcast_to_all_clients client, msg
+        end
+      end
+
+      def broadcast_to_all_clients client, msg
+        @clients.reject { |c| c.id == client.id }.each do |c|
+          c.puts "\n#{client.name}> #{msg}" unless msg.nil? || msg == ''
         end
       end
 
