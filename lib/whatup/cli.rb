@@ -2,8 +2,8 @@
 
 require 'thor'
 
-require 'whatup/server'
-require 'whatup/client'
+require 'whatup/server/server'
+require 'whatup/client/client'
 
 module Whatup
   # Thor command classes for the cli.
@@ -18,7 +18,8 @@ module Whatup
       DESC
       desc 'connect', 'Connects a new client instance to a server'
       def connect
-        Whatup::Client.new(ip: options[:ip], port: options[:port]).connect
+        config = {ip: options[:ip], port: options[:port]}
+        Whatup::Client::Client.new(config).connect
       end
     end
 
@@ -30,7 +31,7 @@ module Whatup
         Starts a server instance running locally on the specified port.
       DESC
       def start
-        Whatup::Server.new(port: options[:port]).start
+        Whatup::Server::Server.new(port: options[:port]).start
       end
     end
 
