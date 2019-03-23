@@ -31,26 +31,25 @@ module Whatup
 
       def request!
         puts 'Please enter your username to establish a connection...'
-        begin
-          Thread.new do
-            loop do
-              message = $stdin.gets.chomp
-              @socket.puts message
-            end
+        Thread.new do
+          loop do
+            print '> '
+            input = $stdin.gets&.chomp
+            exit if input.nil?
+            @socket.puts input
           end
-        rescue IOError => e
-          puts e.message
-          # e.backtrace
-          @socket.close
         end
+      rescue IOError => e
+        puts e.message
+        # e.backtrace
+        @socket.close
       end
 
       def listen!
         Thread.new do
           loop do
-            response = @socket.gets.chomp
-            puts response.to_s
-            @socket.close if response.eql? 'quit'
+            response = @socket.gets&.chomp
+            puts response unless response.nil?
           end
         end
       rescue IOError => e

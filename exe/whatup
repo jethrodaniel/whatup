@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require 'whatup/cli'
+require 'whatup/cli/cli'
 
 require 'thor'
 

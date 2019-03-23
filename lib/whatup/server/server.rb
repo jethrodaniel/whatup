@@ -42,12 +42,19 @@ module Whatup
         puts "#{name} just showed up!"
         client.puts "Hello, #{name}!"
 
-        client.puts 'Sending you the time ...'
-
         loop do
-          client.puts Time.now
+          msg = client.gets&.chomp
+          puts "#{name}> #{msg}" unless msg.nil? || msg == ''
           sleep 1
         end
+
+        # client.puts 'Sending you the time ...'
+
+        # loop do
+        #  client.puts Time.now
+        #  sleep 10
+        #  puts "#{name}> #{client.gets.chomp}"
+        # end
       end
 
       def exit_if_pid_exists!

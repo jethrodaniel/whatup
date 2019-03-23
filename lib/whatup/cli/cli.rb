@@ -2,8 +2,8 @@
 
 require 'thor'
 
-require 'whatup/cli/client'
-require 'whatup/cli/server'
+require 'whatup/cli/commands/client'
+require 'whatup/cli/commands/server'
 
 module Whatup
   # Thor command classes for the cli.
