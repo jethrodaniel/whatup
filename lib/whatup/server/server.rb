@@ -44,9 +44,11 @@ module Whatup
       private
 
       def handle_client client
-        client = Client.new id: @max_id += 1,
-                            name: client.gets.chomp,
-                            socket: client
+        @clients << client = Client.new(
+          id: @max_id += 1,
+          name: client.gets.chomp,
+          socket: client
+        )
 
         puts "#{client.name} just showed up!"
         client.puts "Hello, #{client.name}!"
@@ -54,7 +56,10 @@ module Whatup
         loop do
           msg = client.gets&.chomp
           puts "#{client.name}> #{msg}" unless msg.nil? || msg == ''
-          sleep 1
+
+          @clients.reject { |c| c.id == client.id }.each do |c|
+            c.puts "\n#{client.name}> #{msg}" unless msg.nil? || msg == ''
+          end
         end
       end
 
