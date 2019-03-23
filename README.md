@@ -6,6 +6,8 @@ whatup is a simple server-based instant messaging application
 
 Check it out on [rubygems.org](https://rubygems.org/gems/whatup).
 
+[![Build Status](https://travis-ci.com/jethrodaniel/whatup.svg?branch=dev)](https://travis-ci.com/jethrodaniel/whatup)
+
 ## Installation
 
 Assuming you have Ruby 2.4 or greater installed,
