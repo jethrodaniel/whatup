@@ -11,7 +11,16 @@ Gem::Specification.new do |spec|
   spec.email         = ['jethrodaniel@gmail.com']
 
   spec.summary       = 'A simple server-based instant messaging application'
-  # spec.description   = 'TODO: Write a longer description or delete this line.'
+  spec.description   = <<~DESC
+    whatup is a simple server-based instant messaging application using TCP
+    sockets.
+
+    It was created for educational purposes.
+
+    It is in development, and currently is both simplified and insecure.
+
+    Please be careful.
+  DESC
   spec.homepage      = 'https://github.com/jethrodaniel/whatup'
   spec.license       = 'MIT'
   spec.required_ruby_version = '~> 2.4'

@@ -5,7 +5,7 @@ AllCops:
 
 # The default is a bit restrictive
 Metrics/AbcSize:
-  Max: 20
+  Max: 30
 
 Metrics/BlockLength:
   Exclude:
