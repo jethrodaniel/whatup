@@ -29,6 +29,10 @@ module Whatup
         exit
       end
 
+      private
+
+      # Prompts for a username, then enter into a loop, sending all input
+      # to the server
       def request!
         puts 'Please enter your username to establish a connection...'
         Thread.new do
@@ -44,6 +48,7 @@ module Whatup
         @socket.close
       end
 
+      # Continually listen to the server, and print anything received
       def listen!
         Thread.new do
           loop do
