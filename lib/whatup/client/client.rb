@@ -41,7 +41,6 @@ module Whatup
         end
       rescue IOError => e
         puts e.message
-        # e.backtrace
         @socket.close
       end
 
@@ -54,7 +53,6 @@ module Whatup
         end
       rescue IOError => e
         puts e.message
-        # e.backtrace
         @socket.close
       end
     end

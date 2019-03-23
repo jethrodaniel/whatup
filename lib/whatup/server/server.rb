@@ -3,18 +3,24 @@
 require 'socket'
 require 'fileutils'
 
+require 'whatup/server/client'
+
 module Whatup
   module Server
     class Server
       include Thor::Shell
+
+      Client = Whatup::Server::Client
 
       def initialize port:
         @ip = 'localhost'
         @port = port
         @address = "#{@ip}:#{@port}"
 
-        @pid = Process.pid
+        @clients = []
+        @max_id = 1
 
+        @pid = Process.pid
         @pid_file = "#{Dir.home}/.whatup.pid"
       end
 
@@ -38,23 +44,18 @@ module Whatup
       private
 
       def handle_client client
-        name = client.gets.chomp
-        puts "#{name} just showed up!"
-        client.puts "Hello, #{name}!"
+        client = Client.new id: @max_id += 1,
+                            name: client.gets.chomp,
+                            socket: client
+
+        puts "#{client.name} just showed up!"
+        client.puts "Hello, #{client.name}!"
 
         loop do
           msg = client.gets&.chomp
-          puts "#{name}> #{msg}" unless msg.nil? || msg == ''
+          puts "#{client.name}> #{msg}" unless msg.nil? || msg == ''
           sleep 1
         end
-
-        # client.puts 'Sending you the time ...'
-
-        # loop do
-        #  client.puts Time.now
-        #  sleep 10
-        #  puts "#{name}> #{client.gets.chomp}"
-        # end
       end
 
       def exit_if_pid_exists!

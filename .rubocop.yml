@@ -3,10 +3,14 @@
 AllCops:
   TargetRubyVersion: 2.4 # Modern Ruby
 
-# Gemspecs are just a giant block, anyway
+# The default is a bit restrictive
+Metrics/AbcSize:
+  Max: 20
+
 Metrics/BlockLength:
   Exclude:
     - 'whatup.gemspec'
+    - 'spec/**/*_spec.rb'
 
 Metrics/MethodLength:
   Max: 20 # 10 is a bit too low
