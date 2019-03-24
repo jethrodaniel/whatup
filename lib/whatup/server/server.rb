@@ -185,6 +185,7 @@ module Whatup
       def kill
         say "Killing the server with PID:#{Process.pid} ...", :red
         FileUtils.rm_rf @pid_file
+        exit
       end
     end
   end

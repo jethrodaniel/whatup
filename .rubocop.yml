@@ -3,12 +3,27 @@
 AllCops:
   TargetRubyVersion: 2.4 # Modern Ruby
 
+# Needed for the server pid
+Style/GlobalVars:
+  Exclude:
+    - 'spec/system_spec.rb'
+
+# Aruba uses modifiable strings
+Style/FrozenStringLiteralComment:
+  Exclude:
+    - 'spec/system_spec.rb'
+
 # The default is a bit restrictive
 Metrics/AbcSize:
   Max: 30
 
+# The default is a bit restrictive
 Metrics/ClassLength:
   Max: 130
+
+# <<~OUTPUT.gsub /^\s+/, ''
+Lint/AmbiguousRegexpLiteral:
+  Enabled: false
 
 Metrics/BlockLength:
   Exclude:

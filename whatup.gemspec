@@ -56,7 +56,8 @@ Gem::Specification.new do |spec|
     'rake' => '~> 12.3.2',
     'rspec' => '~> 3.8',
     'yard' => '~> 0.9.18',
-    'rubocop' => '~> 0.65.0'
+    'rubocop' => '~> 0.65.0',
+    'aruba' => '~> 0.14.9'
   }.each do |gem, version|
     spec.add_development_dependency gem, version
   end

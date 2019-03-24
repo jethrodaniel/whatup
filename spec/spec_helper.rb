@@ -14,3 +14,10 @@ RSpec.configure do |config|
     c.syntax = :expect
   end
 end
+
+# aruba additions
+# $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+
+# ['../support/**/*.rb', '../support/*.rb'].each do |path|
+#  ::Dir.glob(::File.expand(path, __FILE__)).each { |f| require_relative f }
+# end
