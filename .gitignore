@@ -11,7 +11,7 @@
 .rspec_status
 
 # vagrant
-vagrant/.vagrant
+vagrant/*
 **/*.log
 
 # Since this is a gem, don't include the lock file
