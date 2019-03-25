@@ -29,7 +29,7 @@ RSpec.describe 'whatup', type: :aruba do
     end
   end
 
-  context 'when first connecting, a name is required' do
+  context 'when first connecting to the server' do
     let(:output) do
       <<~OUTPUT.gsub /^\s+/, ''
         Connecting to localhost:9001 ...
