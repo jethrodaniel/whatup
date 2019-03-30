@@ -21,11 +21,13 @@ module Whatup
       desc 'list', 'show all connected clients'
       def list
         say 'All connected clients:'
-        @server.clients.each { |c| say c.name, :green }
+        @server.clients.each do |c|
+          say "#{c.name}#{c.chatting? ? ' (busy chatting)' : ''}"
+        end
       end
 
-      desc 'chat [NAME]', 'starts a chat with the specified client'
-      def chat client, name
+      desc 'chat [CLIENT]', 'starts a chat with the specified client'
+      def chat client
         # @server.
       end
 

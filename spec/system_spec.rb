@@ -58,7 +58,7 @@ RSpec.describe 'whatup', type: :aruba do
           Please enter your username to establish a connection...
           > > > Hello, zeus!
           Commands:
-            chat [NAME]     # starts a chat with the specified client
+            chat [CLIENT]   # starts a chat with the specified client
             exit            # closes a client's connection with the server
             help [COMMAND]  # Describe available commands or one specific command
             list            # show all connected clients

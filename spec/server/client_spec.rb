@@ -45,4 +45,10 @@ RSpec.describe Whatup::Server::Client do
       expect(client.socket).to respond_to :puts
     end
   end
+
+  describe '.chatting?' do
+    it 'returns whether or not the client is chatting with another client' do
+      expect(client.chatting?).to be false
+    end
+  end
 end

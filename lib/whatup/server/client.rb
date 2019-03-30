@@ -10,6 +10,7 @@ module Whatup
         @id = id
         @name = name
         @socket = socket
+        @chatting = false
       end
 
       def puts msg
@@ -18,6 +19,10 @@ module Whatup
 
       def gets
         @socket.gets
+      end
+
+      def chatting?
+        @chatting
       end
     end
   end
