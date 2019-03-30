@@ -51,26 +51,48 @@ RSpec.describe 'whatup', type: :aruba do
   end
 
   context 'after connecting to the server' do
-    let(:output) do
-      <<~OUTPUT
-        Connecting to localhost:9001 ...
-        Please enter your username to establish a connection...
-        > > > Hello, zeus!
-        Commands:
-          chat            # starts a chat with the specified client
-          exit            # closes a client's connection with the server
-          help [COMMAND]  # Describe available commands or one specific command
-          list            # show all connected clients
+    describe 'help' do
+      let(:output) do
+        <<~OUTPUT
+          Connecting to localhost:9001 ...
+          Please enter your username to establish a connection...
+          > > > Hello, zeus!
+          Commands:
+            chat            # starts a chat with the specified client
+            exit            # closes a client's connection with the server
+            help [COMMAND]  # Describe available commands or one specific command
+            list            # show all connected clients
 
-        Exiting ...
-      OUTPUT
+          Exiting ...
+        OUTPUT
+      end
+
+      it 'shows help' do
+        type 'zeus'
+        type 'help'
+        sleep 0.5
+        expect(last_command_stopped.output).to eq output
+      end
     end
 
-    it 'shows help if `help` is called' do
-      type 'zeus'
-      type 'help'
-      sleep 0.5
-      expect(last_command_stopped.output).to eq output
+    describe 'list' do
+      let(:output) do
+        <<~OUTPUT
+          Connecting to localhost:9001 ...
+          Please enter your username to establish a connection...
+          > > > Hello, zeus!
+          All connected clients:
+          zeus
+          Exiting ...
+        OUTPUT
+      end
+
+      it 'shows all connected clients' do
+        type 'zeus'
+        type 'list'
+        sleep 0.5
+        expect(last_command_stopped.output).to eq output
+      end
     end
   end
 end

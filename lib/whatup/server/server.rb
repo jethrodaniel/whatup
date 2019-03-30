@@ -2,6 +2,7 @@
 
 require 'socket'
 require 'fileutils'
+require 'securerandom'
 
 require 'whatup/server/client'
 require 'whatup/cli/commands/interactive'
@@ -12,6 +13,9 @@ module Whatup
       include Thor::Shell
 
       Client = Whatup::Server::Client
+
+      # Used by the interactive client cli
+      attr_reader *%i[ip port address clients max_id]
 
       def initialize port:
         @ip = 'localhost'
@@ -40,7 +44,7 @@ module Whatup
         loop do
           Thread.new(@socket.accept) { |client| handle_client client }
         end
-      rescue SignalException
+      rescue SignalException # In case of ^c
         kill
       end
 
@@ -48,10 +52,14 @@ module Whatup
 
       # Receives a username from a client, then creates a new client unless a
       # client with that username already exists.
+      #
+      # If no username is provided (i.e, blank), it assigns a random, anonymous
+      # username in the format `ANON-xxx`, where `xxx` is a random number upto
+      # 100, left-padded with zeros.
       def handle_client client
-        # Add a new client
-        name = client.gets.chomp
-        name = name == '' ? 'ANON' : name
+        name     = client.gets.chomp
+        rand_num = SecureRandom.random_number(100).to_s.rjust 3, '0'
+        name     = name == '' ? "ANON-#{rand_num}" : name
 
         if @clients.any? { |c| c.name == name }
           client.puts 'That name is taken! Goodbye.'
@@ -84,7 +92,7 @@ module Whatup
 
       # Parses a client's input, and manages the client's interactive cli
       def parse_input client, msg
-        cli = Whatup::CLI::Interactive.new
+        cli = Whatup::CLI::Interactive.new.tap { |c| c.server = self }
 
         cmd, args = *msg.split(/\s+/)
 
@@ -99,6 +107,7 @@ module Whatup
         end
 
         begin
+          # TODO: make this accept color outputs
           output = capture_stdout do
             cmd.run cli, *args
           end

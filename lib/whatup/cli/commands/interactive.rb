@@ -10,6 +10,8 @@ module Whatup
     #
     # This class is run on the server
     class Interactive < Thor
+      attr_accessor :server
+
       # Don't show app name in command help, i.e, instead of
       # `app command desc`, use `command desc`
       def self.banner task, _namespace = false, subcommand = false
@@ -17,7 +19,10 @@ module Whatup
       end
 
       desc 'list', 'show all connected clients'
-      def list; end
+      def list
+        say 'All connected clients:'
+        @server.clients.each { |c| say c.name, :green }
+      end
 
       desc 'chat', 'starts a chat with the specified client'
       def chat client; end

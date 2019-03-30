@@ -3,6 +3,10 @@
 AllCops:
   TargetRubyVersion: 2.4 # Modern Ruby
 
+# attr_reader *%i[a b c]
+Lint/UnneededSplatExpansion:
+  Enabled: false
+
 # Needed for the server pid
 Style/GlobalVars:
   Exclude:
