@@ -15,7 +15,7 @@ module Whatup
       Client = Whatup::Server::Client
 
       # Used by the interactive client cli
-      attr_reader *%i[ip port address clients max_id]
+      attr_reader *%i[ip port address clients max_id pid pid_file]
 
       def initialize port:
         @ip = 'localhost'

@@ -24,8 +24,10 @@ module Whatup
         @server.clients.each { |c| say c.name, :green }
       end
 
-      desc 'chat', 'starts a chat with the specified client'
-      def chat client; end
+      desc 'chat [NAME]', 'starts a chat with the specified client'
+      def chat client, name
+        # @server.
+      end
 
       desc 'exit', "closes a client's connection with the server"
       def exit; end
