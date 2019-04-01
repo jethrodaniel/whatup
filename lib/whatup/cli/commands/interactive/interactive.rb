@@ -18,6 +18,8 @@ module Whatup
     class Interactive < Thor
       prepend InteractiveSetup
 
+      attr_accessor :server
+
       # Don't show app name in command help, i.e, instead of
       # `app command desc`, use `command desc`
       def self.banner task, _namespace = false, subcommand = false
@@ -27,8 +29,6 @@ module Whatup
       desc 'list', 'show all connected clients'
       def list
         say 'All connected clients:'
-        if @server&.clients.nil?
-        end
 
         @server.clients.each do |c|
           say "#{c.name}#{c.chatting? ? ' (busy chatting)' : ''}"
