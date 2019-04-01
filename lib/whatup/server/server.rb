@@ -42,10 +42,6 @@ module Whatup
 
         # Listen for connections, then accept each in a separate thread
         loop do
-          Thread.new(@socket.accept) { |client| handle_client client }
-        end
-
-        loop do
           Thread.new(@socket.accept) do |client|
             case handle_client client
             when :exit
