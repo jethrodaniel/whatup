@@ -5,7 +5,7 @@ require 'fileutils'
 require 'securerandom'
 
 require 'whatup/server/client'
-require 'whatup/cli/commands/interactive'
+require 'whatup/cli/commands/interactive/interactive'
 
 module Whatup
   module Server
@@ -44,11 +44,38 @@ module Whatup
         loop do
           Thread.new(@socket.accept) { |client| handle_client client }
         end
+
+        loop do
+          Thread.new(@socket.accept) do |client|
+            case handle_client client
+            when :exit
+              client.puts 'bye!'
+              Thread.kill Thread.current
+            end
+          end
+        end
       rescue SignalException # In case of ^c
         kill
       end
 
       private
+
+      # Receives a new client, then continuously gets input from that client
+      def handle_client client
+        client = create_new_client_if_not_existing! client
+
+        loop do
+          msg = client.gets&.chomp
+
+          next if msg.nil?
+
+          msg = 'help' if msg == ''
+
+          puts "#{client.name}> #{msg}" # TODO: use Readline
+          parse_input client, msg
+          # broadcast_to_all_clients client, msg
+        end
+      end
 
       # Receives a username from a client, then creates a new client unless a
       # client with that username already exists.
@@ -56,7 +83,7 @@ module Whatup
       # If no username is provided (i.e, blank), it assigns a random, anonymous
       # username in the format `ANON-xxx`, where `xxx` is a random number upto
       # 100, left-padded with zeros.
-      def handle_client client
+      def create_new_client_if_not_existing! client
         name     = client.gets.chomp
         rand_num = SecureRandom.random_number(100).to_s.rjust 3, '0'
         name     = name == '' ? "ANON-#{rand_num}" : name
@@ -74,78 +101,62 @@ module Whatup
 
         puts "#{client.name} just showed up!"
         client.puts "Hello, #{client.name}!"
+        client
+      end
 
-        loop do
-          msg = client.gets&.chomp
-          next if msg.nil? || msg == ''
+      # Parses a client's input, and manages the client's interactive cli
+      #
+      # This just splits the user's input by whitespace, then passes that
+      # to Thor - at that point, the rest of the parsing and command logic
+      # is delegated to the cli classes, and we just catch any exception
+      # that is thrown from them in case of a missing command or other input
+      # violations.
+      #
+      # @param [TCPSocket] client - the client that is connecting
+      # @param [String] msg - the client's message
+      def parse_input client, msg
+        # Split user input at the first "option"
+        cmds, opts = msg.split /-|--/, 2
 
-          puts "#{client.name}> #{msg}"
-          parse_input client, msg
-          # broadcast_to_all_clients client, msg
+        # Then split each by whitespace
+        cmds = cmds&.split(/\s+/)
+        opts = opts&.split(/\s+/)
+
+        # `Whatup::CLI::Interactive.new(cmds, opts)` expects arrays, and
+        # a final options hash
+        cmds = [] if cmds.nil?
+        opts = [] if opts.nil?
+
+        # Initialize a new cli class using the commands and options, and
+        # additionally set any instance variables.
+        cli = Whatup::CLI::Interactive.new(cmds, opts).tap do |c|
+          c.server = self # We need a mutex for this, actually
+        end
+
+        begin
+          # TODO: make this accept color outputs
+          output = capture_stdout do
+            # Invoke the cli using the provided commands and options.
+            #
+            # This _should_ achieve the same effect as
+            # `Whatup::CLI::Interactive.start(args)`, but allows us to set
+            # instance variables on the cli class.
+            cli.invoke cli.args.first, cli.args[1..cli.args.size - 1]
+          end
+
+          # Send the output to the client
+          client.puts output
+        rescue RuntimeError,
+               Thor::InvocationError,
+               Thor::UndefinedCommandError => e
+          puts e.message
+          client.puts 'Invalid input or unknown command'
         end
       end
 
       # @return A new, unique client identification number
       def new_client_id
         @max_id += 1
-      end
-
-      # Parses a client's input, and manages the client's interactive cli
-      def parse_input client, msg
-        cli = Whatup::CLI::Interactive.new.tap { |c| c.server = self }
-
-        cmd, args = *msg.split(/\s+/)
-
-        return if handle_help_commands!(client, cmd, msg)
-
-        # Get the requested command
-        cmd = Whatup::CLI::Interactive.commands[cmd]
-
-        if cmd.nil?
-          client.puts "unknown command #{cmd}"
-          return
-        end
-
-        begin
-          # TODO: make this accept color outputs
-          output = capture_stdout do
-            cmd.run cli, *args
-          end
-          client.puts output
-        rescue Thor::InvocationError => e
-          client.puts e.message
-          return
-        end
-      end
-
-      # Parses input, and handles any help commands.
-      #
-      # @return True if the callee should return as well, else nil
-      def handle_help_commands! client, cmd, msg
-        # If the client enters whitespace, or `help`
-        if cmd.nil? || msg == 'help'
-          output = capture_stdout do
-            Whatup::CLI::Interactive.help Whatup::CLI::Interactive.new
-          end
-          client.puts output
-          return true
-        end
-
-        # Handle `help ...` commands separately.
-        #
-        # {'cmd' => some_command} or nil, if not help
-        help_cmd = msg.match(/\Ahelp (?<cmd>\w+)\s*/)&.named_captures
-
-        return unless help_cmd && help_cmd['cmd']
-
-        output = capture_stdout do
-          Whatup::CLI::Interactive.command_help(
-            Whatup::CLI::Interactive.new,
-            help_cmd['cmd']
-          )
-        end
-        client.puts output
-        true
       end
 
       # Capture all stdout within a block into a string.
