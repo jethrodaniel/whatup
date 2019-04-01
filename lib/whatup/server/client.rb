@@ -24,6 +24,11 @@ module Whatup
       def chatting?
         @chatting
       end
+
+      def input!
+        loop while (msg = gets).blank?
+        msg
+      end
     end
   end
 end

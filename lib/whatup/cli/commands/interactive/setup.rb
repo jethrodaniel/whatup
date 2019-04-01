@@ -15,6 +15,7 @@ module Whatup
         define_method cmd do |*args|
           cli = instance_variable_get(:@_initializer).last[:shell].base
           @server = cli.server
+          @current_user = cli.current_user
           super *args
         end
       end

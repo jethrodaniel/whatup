@@ -20,6 +20,7 @@ module Whatup
 
         @socket = TCPSocket.open @dest[:ip], @dest[:port]
 
+        puts 'Please enter your username to establish a connection...'
         @request = request!
         @response = listen!
 
@@ -31,14 +32,11 @@ module Whatup
 
       private
 
-      # Prompts for a username, then enter into a loop, sending all input
-      # to the server
+      # Loop and send all input to the server
       def request!
-        puts 'Please enter your username to establish a connection...'
         Thread.new do
           loop do
-            print '> '
-            input = $stdin.gets&.chomp
+            input = Readline.readline '~> ', true
             exit if input.nil?
             @socket.puts input
           end
@@ -53,7 +51,7 @@ module Whatup
         Thread.new do
           loop do
             response = @socket.gets&.chomp
-            puts response unless response.nil?
+            puts response # unless response.nil?
           end
         end
       rescue IOError => e

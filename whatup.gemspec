@@ -57,7 +57,8 @@ Gem::Specification.new do |spec|
     'rspec' => '~> 3.8',
     'yard' => '~> 0.9.18',
     'rubocop' => '~> 0.65.0',
-    'aruba' => '~> 0.14.9'
+    'aruba' => '~> 0.14.9',
+    'activesupport' => '~> 5.2'
   }.each do |gem, version|
     spec.add_development_dependency gem, version
   end

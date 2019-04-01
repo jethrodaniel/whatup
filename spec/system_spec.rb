@@ -37,8 +37,9 @@ RSpec.describe 'whatup', type: :aruba do
     let(:output) do
       <<~OUTPUT.gsub /^\s+/, ''
         Connecting to localhost:9001 ...
-        Please enter your username to establish a connection...
-        > > Hello, zeus!
+        ~> zeus
+        ~> Please enter your username to establish a connection...
+        Hello, zeus!
         Exiting ...
       OUTPUT
     end
@@ -55,13 +56,15 @@ RSpec.describe 'whatup', type: :aruba do
       let(:output) do
         <<~OUTPUT
           Connecting to localhost:9001 ...
-          Please enter your username to establish a connection...
-          > > > Hello, zeus!
+          ~> zeus
+          ~> help
+          ~> Please enter your username to establish a connection...
+          Hello, zeus!
           Commands:
-            chat [CLIENT]   # starts a chat with the specified client
+            chat [NAME]     # Start chatting with the [NAME] in a new chat room
             exit            # closes a client's connection with the server
             help [COMMAND]  # Describe available commands or one specific command
-            list            # show all connected clients
+            list            # Show all connected clients
 
           Exiting ...
         OUTPUT
@@ -79,8 +82,10 @@ RSpec.describe 'whatup', type: :aruba do
       let(:output) do
         <<~OUTPUT
           Connecting to localhost:9001 ...
-          Please enter your username to establish a connection...
-          > > > Hello, zeus!
+          ~> zeus
+          ~> list
+          ~> Please enter your username to establish a connection...
+          Hello, zeus!
           All connected clients:
           zeus
           Exiting ...
@@ -89,6 +94,7 @@ RSpec.describe 'whatup', type: :aruba do
 
       it 'shows all connected clients' do
         type 'zeus'
+        sleep 0.5
         type 'list'
         sleep 0.5
         expect(last_command_stopped.output).to eq output
