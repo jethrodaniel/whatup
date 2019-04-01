@@ -10,13 +10,11 @@ module Whatup
     # cli instance.
     #
     # TODO: grab commands dynamically
-    module ServerSetup
+    module InteractiveSetup
       Whatup::CLI::COMMANDS.each do |cmd|
         define_method cmd do |*args|
-          @server = instance_variable_get(:@_initializer)
-                    .last[:shell]
-                    .base
-                    .server
+          cli = instance_variable_get(:@_initializer).last[:shell].base
+          @server = cli.server
           super *args
         end
       end

@@ -16,9 +16,7 @@ module Whatup
     #
     # This class is run on the server
     class Interactive < Thor
-      prepend ServerSetup
-
-      attr_accessor :server
+      prepend InteractiveSetup
 
       # Don't show app name in command help, i.e, instead of
       # `app command desc`, use `command desc`
