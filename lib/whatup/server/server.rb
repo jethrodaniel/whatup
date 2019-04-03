@@ -89,11 +89,13 @@ module Whatup
               cli.invoke cli.args.first, cli.args[1..cli.args.size - 1]
             end
           rescue RuntimeError,
-                 ArgumentError,
                  Thor::InvocationError,
                  Thor::UndefinedCommandError => e
             puts e.message
             client.puts 'Invalid input or unknown command'
+          rescue ArgumentError => e
+            puts e.message
+            client.puts e.message
           end
           msg = nil # rubocop:disable Lint/UselessAssignment
         end
