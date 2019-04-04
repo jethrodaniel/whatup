@@ -8,6 +8,7 @@ Check it out on [rubygems.org](https://rubygems.org/gems/whatup).
 
 [![Build Status](https://travis-ci.com/jethrodaniel/whatup.svg?branch=dev)](https://travis-ci.com/jethrodaniel/whatup)
 [![Maintainability](https://api.codeclimate.com/v1/badges/e5356174302d82cf67cb/maintainability)](https://codeclimate.com/github/jethrodaniel/whatup/maintainability)
+[![Gem Version](https://badge.fury.io/rb/whatup.svg)](https://badge.fury.io/rb/whatup)
 
 ## Installation
 
