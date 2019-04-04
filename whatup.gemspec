@@ -49,23 +49,25 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
+  # rubocop:disable Layout/AlignHash
   {
-    'pry' => '~> 0.12.2',
+    'pry'        => '~> 0.12.2',
     'pry-byebug' => '~> 3.7',
-    'bundler' => '~> 2.0',
-    'rake' => '~> 12.3.2',
-    'rspec' => '~> 3.8',
-    'yard' => '~> 0.9.18',
-    'rubocop' => '~> 0.65.0',
-    'aruba' => '~> 0.14.9',
-    'activesupport' => '~> 5.2'
+    'bundler'    => '~> 2.0',
+    'rake'       => '~> 12.3.2',
+    'rspec'      => '~> 3.8',
+    'yard'       => '~> 0.9.18',
+    'rubocop'    => '~> 0.65.0',
+    'aruba'      => '~> 0.14.9'
   }.each do |gem, version|
     spec.add_development_dependency gem, version
   end
 
   {
-    'thor' => '~> 0.20.3'
+    'activesupport' => '~> 5.2',
+    'thor'          => '~> 0.20.3'
   }.each do |gem, version|
     spec.add_dependency gem, version
   end
+  # rubocop:enable Layout/AlignHash
 end
