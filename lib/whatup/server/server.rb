@@ -7,6 +7,7 @@ require 'securerandom'
 require 'active_support/core_ext/object/blank'
 
 require 'whatup/server/client'
+require 'whatup/server/room'
 require 'whatup/cli/commands/interactive/interactive'
 
 module Whatup
@@ -17,7 +18,7 @@ module Whatup
       Client = Whatup::Server::Client
 
       # Used by the interactive client cli
-      attr_reader *%i[ip port address clients max_id pid pid_file]
+      attr_reader *%i[ip port address clients max_id pid pid_file rooms]
 
       def initialize port:
         @ip = 'localhost'
@@ -25,6 +26,7 @@ module Whatup
         @address = "#{@ip}:#{@port}"
 
         @clients = []
+        @rooms = []
         @max_id = 1
 
         @pid = Process.pid
@@ -56,17 +58,33 @@ module Whatup
         kill
       end
 
+      def find_client_by name:
+        @clients.select { |c| c.name == name }&.first
+      end
+
+      def new_room! clients: [], name:
+        room = Room.new name: name, clients: clients
+        @rooms << room
+        room
+      end
+
       private
 
       # Receives a new client, then continuously gets input from that client
-      def handle_client client # rubocop:disable Metrics/MethodLength
+      #
+      # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+      def handle_client client
         client = create_new_client_if_not_existing! client
 
         # Loop forever to maintain the connection
         loop do
+          handle_chatting(client) if client.chatting?
+
           # Wait until we get a valid command. This takes as long as the client
           # takes.
           msg = client.input! unless Whatup::CLI::Interactive.command?(msg)
+
+          puts "#{client.name}> #{msg}"
 
           # Initialize a new cli class using the initial command and options,
           # and then set any instance variables, since Thor will create a new
@@ -76,7 +94,6 @@ module Whatup
             c.server = self
             c.current_user = client
           end
-          puts "#{client.name}> #{msg}"
 
           begin
             # Send the output to the client
@@ -99,7 +116,22 @@ module Whatup
           end
           msg = nil # rubocop:disable Lint/UselessAssignment
         end
-        # broadcast_to_all_clients client, msg
+      end
+      # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
+
+      def handle_chatting client
+        loop do
+          input = client.input!
+          room = client.room
+          puts "#{client.name}> #{input}"
+          if input == '.exit'
+            client.leave_room!
+            break
+          end
+          room.broadcast except: client do
+            "#{client.name}> #{input}"
+          end
+        end
       end
 
       # Receives a username from a client, then creates a new client unless a
@@ -115,7 +147,7 @@ module Whatup
 
         if @clients.any? { |c| c.name == name }
           client.puts 'That name is taken! Goodbye.'
-          return
+          client.exit!
         end
 
         @clients << client = Client.new(
@@ -144,12 +176,6 @@ module Whatup
       ensure
         $stdin  = original_stdin
         $stdout = original_stdout
-      end
-
-      def broadcast_to_all_clients client, msg
-        @clients.reject { |c| c.id == client.id }.each do |c|
-          c.puts "\n#{client.name}> #{msg}" unless msg.nil? || msg == ''
-        end
       end
 
       def exit_if_pid_exists!

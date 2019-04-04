@@ -23,7 +23,7 @@ Metrics/AbcSize:
 
 # The default is a bit restrictive
 Metrics/ClassLength:
-  Max: 130
+  Max: 145
 
 # <<~OUTPUT.gsub /^\s+/, ''
 Lint/AmbiguousRegexpLiteral:

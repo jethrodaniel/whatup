@@ -8,7 +8,7 @@ module Whatup
   module CLI
     # Any methods of class `Whatup::CLI::Interactive` that rely on instance
     # variables should be included here
-    COMMANDS = %i[chat list].freeze
+    COMMANDS = %i[room list exit].freeze
 
     require 'whatup/cli/commands/interactive/setup'
 
@@ -57,27 +57,59 @@ module Whatup
       desc 'list', 'Show all connected clients'
       def list
         say 'All connected clients:'
-
-        @server.clients.each do |c|
-          say "#{c.name}#{c.chatting? ? ' (busy chatting)' : ''}"
-        end
+        @server.clients.each { |c| say c.status }
       end
 
-      desc 'chat [NAME]', 'Start chatting with the [NAME] in a new chat room'
-      def chat name
-        client = @server.clients.select { |c| c.name == name }&.first
+      desc 'room [NAME]', 'Create and enter chatroom [NAME]'
+      def room name
+        if room = @server.rooms.select { |r| r.name == name }&.first
+          @current_user.puts <<~MSG
+            Entering #{room.name}... enjoy your stay!
 
-        if client.nil?
-          @current_user.puts "No client named `#{client.inspect}` found!"
+            Type `.exit` to exit this chat room.
+
+            Currently in this room:
+            #{room.clients.map do |client|
+                "- #{client.name}\n"
+              end.join}
+          MSG
+          @current_user.room = room
+
+          room.broadcast except: @current_user do
+            <<~MSG
+              #{@current_user.name} has arrived! Play nice, kids.
+            MSG
+          end
+
+          room.clients << @current_user
           return
         end
 
-        @current_user.puts "you are #{@current_user}"
-        @current_user.puts "trying to talk to: #{client}"
+        room = @server.new_room! name: name, clients: [@current_user]
+
+        @current_user.puts <<~MSG
+          Created and entered #{room.name}... invite some people or something!
+
+          Type `.exit` to exit this chat room.
+        MSG
       end
 
-      desc 'exit', "closes a client's connection with the server"
-      def exit; end
+      # desc 'dm [NAME]', 'Send a direct message to [NAME]'
+      # def dm name
+      #   client = @server.find_client_by name: name
+
+      #   if client.nil?
+      #     @current_user.puts "No client named `#{name}` found!"
+      #     return
+      #   end
+
+      #   client.send_message
+      # end
+
+      desc 'exit', 'Closes your connection with the server'
+      def exit
+        @current_user.exit!
+      end
     end
   end
 end

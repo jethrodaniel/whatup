@@ -16,6 +16,8 @@ def start_server!
 end
 
 RSpec.describe 'whatup', type: :aruba do
+  before(:all) { ENV['INPUTRC'] = '/dev/null' }
+
   before(:each) do
     stop_server_and_remove_pid_file!
     start_server!
@@ -61,10 +63,10 @@ RSpec.describe 'whatup', type: :aruba do
           ~> Please enter your username to establish a connection...
           Hello, zeus!
           Commands:
-            chat [NAME]     # Start chatting with the [NAME] in a new chat room
-            exit            # closes a client's connection with the server
+            exit            # Closes your connection with the server
             help [COMMAND]  # Describe available commands or one specific command
             list            # Show all connected clients
+            room [NAME]     # Create and enter chatroom [NAME]
 
           Exiting ...
         OUTPUT

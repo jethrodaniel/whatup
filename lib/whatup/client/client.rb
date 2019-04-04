@@ -51,6 +51,9 @@ module Whatup
         Thread.new do
           loop do
             response = @socket.gets&.chomp
+
+            exit if response == 'END'
+
             puts response # unless response.nil?
           end
         end
