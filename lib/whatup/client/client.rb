@@ -52,7 +52,10 @@ module Whatup
           loop do
             response = @socket.gets&.chomp
 
-            exit if response == 'END'
+            if response == 'END'
+              puts
+              exit
+            end
 
             puts response # unless response.nil?
           end

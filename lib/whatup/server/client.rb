@@ -48,7 +48,7 @@ module Whatup
       end
 
       def exit!
-        puts "END\n"
+        puts 'END'
         Thread.kill Thread.current
       end
     end
