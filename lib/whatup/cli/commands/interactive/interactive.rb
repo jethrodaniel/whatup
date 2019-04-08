@@ -57,7 +57,8 @@ module Whatup
       desc 'list', 'Show all connected clients'
       def list
         say 'All connected clients:'
-        @server.clients.each { |c| say c.status }
+        @server.clients_except(@current_user).each { |c| say c.status }
+        say "#{@current_user.status} (you)"
       end
 
       desc 'room [NAME]', 'Create and enter chatroom [NAME]'

@@ -62,6 +62,10 @@ module Whatup
         @clients.select { |c| c.name == name }&.first
       end
 
+      def clients_except client
+        @clients.reject { |c| c == client }
+      end
+
       def new_room! clients: [], name:
         room = Room.new name: name, clients: clients
         @rooms << room

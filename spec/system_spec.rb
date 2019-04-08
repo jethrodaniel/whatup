@@ -89,7 +89,7 @@ RSpec.describe 'whatup', type: :aruba do
           ~> Please enter your username to establish a connection...
           Hello, zeus!
           All connected clients:
-          zeus
+          zeus (you)
           Exiting ...
         OUTPUT
       end
