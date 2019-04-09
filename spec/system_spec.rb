@@ -20,7 +20,7 @@ RSpec.describe 'whatup', type: :aruba do
   before(:each) do
     stop_server_and_remove_pid_file!
     start_server!
-    run_command 'exe/whatup client connect', exit_timeout: 0.1
+    run_command 'exe/whatup client connect', exit_timeout: 0.5
   end
 
   after(:each) { stop_server_and_remove_pid_file! }
