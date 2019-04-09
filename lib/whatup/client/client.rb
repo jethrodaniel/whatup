@@ -37,7 +37,8 @@ module Whatup
         Thread.new do
           loop do
             input = Readline.readline '~> ', true
-            exit if input.nil?
+            next if input.nil?
+
             @socket.puts input
           end
         end
@@ -54,6 +55,7 @@ module Whatup
 
             if response == 'END'
               puts
+              kill_all_but_current_thread!
               exit
             end
 
@@ -63,6 +65,12 @@ module Whatup
       rescue IOError => e
         puts e.message
         @socket.close
+      end
+
+      def kill_all_but_current_thread!
+        Thread.list.each do |thread|
+          thread.exit unless thread == Thread.current
+        end
       end
     end
   end

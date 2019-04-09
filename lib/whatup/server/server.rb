@@ -17,15 +17,13 @@ require 'whatup/cli/commands/interactive/interactive'
 
 module Whatup
   module Server
-    class Server
+    class Server # rubocop:disable Metrics/ClassLength
       include Thor::Shell
       include DbInit
       include Redirection
 
-      # For convenience
       Client = Whatup::Server::Client
 
-      # Used by the interactive client cli
       attr_reader *%i[ip port address clients pid pid_file rooms]
 
       def initialize ip: 'localhost', port:
@@ -85,13 +83,21 @@ module Whatup
 
       # Receives a new client, then continuously gets input from that client
       #
-      # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+      # rubocop:disable Metrics/MethodLength
       def handle_client client
         client = create_new_client_if_not_existing! client
 
         # Loop forever to maintain the connection
         loop do
-          handle_chatting(client) if client.chatting?
+          @clients.reject! &:deleted
+
+          Thread.current.exit if client.deleted
+
+          if client.composing_dm?
+            handle_dm client
+          elsif client.chatting?
+            handle_chatting client
+          end
 
           # Wait until we get a valid command. This takes as long as the client
           # takes.
@@ -99,24 +105,11 @@ module Whatup
 
           puts "#{client.name}> #{msg}"
 
-          # Initialize a new cli class using the initial command and options,
-          # and then set any instance variables, since Thor will create a new
-          # class instance when it's invoked.
-          cmds, opts = Whatup::CLI::Interactive.parse_input msg
-          cli = Whatup::CLI::Interactive.new(cmds, opts).tap do |c|
-            c.server = self
-            c.current_user = client
-          end
-
           begin
             # Send the output to the client
             redirect stdin: client.socket, stdout: client.socket do
               # Invoke the cli using the provided commands and options.
-
-              # This _should_ achieve the same effect as
-              # `Whatup::CLI::Interactive.start(args)`, but allows us to set
-              # instance variables on the cli class.
-              cli.invoke cli.args.first, cli.args[1..cli.args.size - 1]
+              run_thor_command! client: client, msg: msg
             end
           rescue RuntimeError,
                  Thor::InvocationError,
@@ -127,10 +120,27 @@ module Whatup
             puts e.message
             client.puts e.message
           end
-          msg = nil # rubocop:disable Lint/UselessAssignment
+          msg = nil
         end
       end
-      # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
+      # rubocop:enable Metrics/MethodLength
+
+      def handle_dm client
+        msg = StringIO.new
+        loop do
+          input = client.input!
+          puts "#{client.name}> #{input}"
+          if input == '.exit'
+            client.puts "Finished dm to `#{client.composing_dm.name}`."
+            break
+          end
+          msg.puts input
+        end
+        client.composing_dm.messages << Message.new(
+          content: msg.string
+        )
+        client.composing_dm = nil
+      end
 
       def handle_chatting client
         loop do
@@ -161,7 +171,9 @@ module Whatup
 
         if @clients.any? { |c| c.name == name }
           client.puts 'That name is taken! Goodbye.'
-          client.exit!
+          client.puts 'END'
+          client.close
+          Thread.current.exit
         end
 
         @clients << client = Client.create!(
@@ -172,6 +184,22 @@ module Whatup
         puts "#{client.name} just showed up!"
         client.puts "Hello, #{client.name}!"
         client
+      end
+
+      def run_thor_command! client:, msg:
+        # Initialize a new cli class using the initial command and options,
+        # and then set any instance variables, since Thor will create a new
+        # class instance when it's invoked.
+        cmds, opts = Whatup::CLI::Interactive.parse_input msg
+        Whatup::CLI::Interactive.new(cmds, opts).tap do |c|
+          c.server = self
+          c.current_user = client
+
+          # This _should_ achieve the same effect as
+          # `Whatup::CLI::Interactive.start(args)`, but allows us to set
+          # instance variables on the cli class.
+          c.invoke c.args.first, c.args.drop(1)
+        end
       end
 
       def exit_if_pid_exists!

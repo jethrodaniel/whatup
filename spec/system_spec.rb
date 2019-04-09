@@ -62,6 +62,7 @@ RSpec.describe 'whatup', type: :aruba do
           ~> Please enter your username to establish a connection...
           Hello, zeus!
           Commands:
+            dm [NAME]       # Send a direct message to [NAME]
             dmlist          # List your received messages
             exit            # Closes your connection with the server
             help [COMMAND]  # Describe available commands or one specific command
@@ -89,7 +90,7 @@ RSpec.describe 'whatup', type: :aruba do
           ~> Please enter your username to establish a connection...
           Hello, zeus!
           All connected clients:
-          zeus (you)
+          * zeus
           Exiting ...
         OUTPUT
       end

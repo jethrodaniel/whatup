@@ -7,6 +7,8 @@ module Whatup
     class Room < ApplicationRecord
       has_many :clients
 
+      validates :name, uniqueness: true
+
       def drop_client! client
         client.update! room_id: nil
       end

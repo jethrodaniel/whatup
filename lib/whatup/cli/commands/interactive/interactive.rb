@@ -8,7 +8,13 @@ module Whatup
   module CLI
     # Any methods of class `Whatup::CLI::Interactive` that rely on instance
     # variables should be included here
-    COMMANDS = %i[room list exit dmlist].freeze
+    COMMANDS = %i[
+      room
+      list
+      exit
+      dmlist
+      dm
+    ].freeze
 
     require 'whatup/cli/commands/interactive/setup'
 
@@ -19,6 +25,7 @@ module Whatup
       prepend InteractiveSetup
 
       Room = Whatup::Server::Room
+      Client = Whatup::Server::Client
 
       attr_accessor *%i[server current_user]
 
@@ -59,13 +66,12 @@ module Whatup
       desc 'list', 'Show all connected clients'
       def list
         say 'All connected clients:'
-        @server.clients_except(@current_user).each { |c| say c.status }
-        say "#{@current_user.status} (you)"
+        @server.clients_except(@current_user).each { |c| say "  #{c.status}" }
+        say "* #{@current_user.status}"
       end
 
       desc 'room [NAME]', 'Create and enter chatroom [NAME]'
       def room name
-        # if room = @server.rooms.select { |r| r.name == name }&.first
         if room = Room.find_by(name: name)
           @current_user.puts <<~MSG
             Entering #{room.name}... enjoy your stay!
@@ -101,7 +107,26 @@ module Whatup
       desc 'dmlist', 'List your received messages'
       def dmlist
         say 'Your direct messages:'
-        @current_user.messages.each { |msg| say msg.contents }
+        @current_user.messages.each do |msg|
+          say msg.content
+        end
+      end
+
+      desc 'dm [NAME]', 'Send a direct message to [NAME]'
+      def dm name
+        if recepient = Client.find_by(name: name)
+          say <<~MSG
+            Sending a direct message to #{name}...
+
+            The message can span multiple lines.
+
+            Type `.exit` when you're ready to send it.
+          MSG
+          @current_user.composing_dm = recepient
+          return
+        end
+
+        say "That user doesn't exist!"
       end
 
       desc 'exit', 'Closes your connection with the server'

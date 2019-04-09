@@ -8,7 +8,9 @@ module Whatup
       has_many :messages
       belongs_to :room, optional: true
 
-      attr_accessor *%i[socket]
+      validates :name, uniqueness: true
+
+      attr_accessor *%i[socket composing_dm deleted]
 
       def puts msg
         socket.puts msg
@@ -27,9 +29,12 @@ module Whatup
         !room_id.nil?
       end
 
+      def composing_dm?
+        !composing_dm.nil?
+      end
+
       def status
-        "#{name}" \
-        "#{chatting? ? " (#{@room.name})" : ''}"
+        "#{name}#{chatting? ? " (#{room.name})" : ''}"
       end
 
       def broadcast msg
@@ -43,7 +48,9 @@ module Whatup
 
       def exit!
         puts 'END'
-        Thread.kill Thread.current
+        socket.close
+        @deleted = true
+        destroy!
       end
     end
   end
