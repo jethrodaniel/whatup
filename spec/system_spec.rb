@@ -1,4 +1,3 @@
-require 'whatup/server/client'
 require 'whatup/server/server'
 
 require 'support/aruba'
@@ -63,6 +62,7 @@ RSpec.describe 'whatup', type: :aruba do
           ~> Please enter your username to establish a connection...
           Hello, zeus!
           Commands:
+            dmlist          # List your received messages
             exit            # Closes your connection with the server
             help [COMMAND]  # Describe available commands or one specific command
             list            # Show all connected clients

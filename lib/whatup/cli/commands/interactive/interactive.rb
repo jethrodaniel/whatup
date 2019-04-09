@@ -8,7 +8,7 @@ module Whatup
   module CLI
     # Any methods of class `Whatup::CLI::Interactive` that rely on instance
     # variables should be included here
-    COMMANDS = %i[room list exit].freeze
+    COMMANDS = %i[room list exit dmlist].freeze
 
     require 'whatup/cli/commands/interactive/setup'
 
@@ -17,6 +17,8 @@ module Whatup
     # This class is run on the server
     class Interactive < Thor
       prepend InteractiveSetup
+
+      Room = Whatup::Server::Room
 
       attr_accessor *%i[server current_user]
 
@@ -63,7 +65,8 @@ module Whatup
 
       desc 'room [NAME]', 'Create and enter chatroom [NAME]'
       def room name
-        if room = @server.rooms.select { |r| r.name == name }&.first
+        # if room = @server.rooms.select { |r| r.name == name }&.first
+        if room = Room.find_by(name: name)
           @current_user.puts <<~MSG
             Entering #{room.name}... enjoy your stay!
 
@@ -74,7 +77,7 @@ module Whatup
                 "- #{client.name}\n"
               end.join}
           MSG
-          @current_user.room = room
+          @current_user.update! room: room
 
           room.broadcast except: @current_user do
             <<~MSG
@@ -95,17 +98,11 @@ module Whatup
         MSG
       end
 
-      # desc 'dm [NAME]', 'Send a direct message to [NAME]'
-      # def dm name
-      #   client = @server.find_client_by name: name
-
-      #   if client.nil?
-      #     @current_user.puts "No client named `#{name}` found!"
-      #     return
-      #   end
-
-      #   client.send_message
-      # end
+      desc 'dmlist', 'List your received messages'
+      def dmlist
+        say 'Your direct messages:'
+        @current_user.messages.each { |msg| say msg.contents }
+      end
 
       desc 'exit', 'Closes your connection with the server'
       def exit

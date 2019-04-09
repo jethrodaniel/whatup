@@ -1,19 +1,29 @@
 # frozen_string_literal: true
 
-require 'whatup/server/client'
-require 'socket'
+require 'whatup/server/server'
+require 'whatup/server/models/client'
+
+require 'securerandom'
+
+def random_port
+  SecureRandom.rand(100) + 9_001
+end
 
 RSpec.describe Whatup::Server::Client do
+  let!(:port) { random_port }
+
   # let! creates the server before the client
-  let!(:server) { TCPServer.new 'localhost', 9_001 }
+  let!(:server) { TCPServer.new 'localhost', port }
 
   subject(:client) do
     Whatup::Server::Client.new(
       id: 1,
       name: 'jethro',
-      socket: TCPSocket.new('localhost', 9_001)
+      socket: TCPSocket.new('localhost', port)
     )
   end
+
+  before(:each) { Whatup::Server::Server.new port: port }
 
   after(:each) do
     client.socket.close

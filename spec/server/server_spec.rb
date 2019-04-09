@@ -30,12 +30,6 @@ RSpec.describe Whatup::Server::Server do
     end
   end
 
-  describe '.max_id' do
-    it "is the server's maximum id value from connected clients" do
-      expect(subject.max_id).to eq 1
-    end
-  end
-
   describe '.pid' do
     it "is the server's process id" do
       expect(subject.pid).to be_a(Integer)

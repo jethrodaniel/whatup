@@ -4,33 +4,42 @@ require 'socket'
 require 'fileutils'
 require 'securerandom'
 
+require 'sqlite3'
+require 'active_record'
 require 'active_support/core_ext/object/blank'
 
-require 'whatup/server/client'
-require 'whatup/server/room'
+require 'whatup/server/db_init'
+require 'whatup/server/redirection'
+require 'whatup/server/models/client'
+require 'whatup/server/models/message'
+require 'whatup/server/models/room'
 require 'whatup/cli/commands/interactive/interactive'
 
 module Whatup
   module Server
     class Server
       include Thor::Shell
+      include DbInit
+      include Redirection
 
+      # For convenience
       Client = Whatup::Server::Client
 
       # Used by the interactive client cli
-      attr_reader *%i[ip port address clients max_id pid pid_file rooms]
+      attr_reader *%i[ip port address clients pid pid_file rooms]
 
-      def initialize port:
-        @ip = 'localhost'
+      def initialize ip: 'localhost', port:
+        @ip = ip
         @port = port
         @address = "#{@ip}:#{@port}"
 
         @clients = []
         @rooms = []
-        @max_id = 1
 
         @pid = Process.pid
         @pid_file = "#{Dir.home}/.whatup.pid"
+
+        DbInit.setup_db!
       end
 
       # Starts the server.
@@ -67,7 +76,7 @@ module Whatup
       end
 
       def new_room! clients: [], name:
-        room = Room.new name: name, clients: clients
+        room = Room.create! name: name, clients: clients
         @rooms << room
         room
       end
@@ -130,6 +139,7 @@ module Whatup
           puts "#{client.name}> #{input}"
           if input == '.exit'
             client.leave_room!
+            client.puts "Exited `#{room.name}`."
             break
           end
           room.broadcast except: client do
@@ -154,8 +164,7 @@ module Whatup
           client.exit!
         end
 
-        @clients << client = Client.new(
-          id: new_client_id,
+        @clients << client = Client.create!(
           name: name,
           socket: client
         )
@@ -163,23 +172,6 @@ module Whatup
         puts "#{client.name} just showed up!"
         client.puts "Hello, #{client.name}!"
         client
-      end
-
-      # @return A new, unique client identification number
-      def new_client_id
-        @max_id += 1
-      end
-
-      # Reroutes stdin and stdout inside a block
-      def redirect stdin: $stdin, stdout: $stdout
-        original_stdin  = $stdin
-        original_stdout = $stdout
-        $stdin  = stdin
-        $stdout = stdout
-        yield
-      ensure
-        $stdin  = original_stdin
-        $stdout = original_stdout
       end
 
       def exit_if_pid_exists!

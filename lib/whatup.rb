@@ -7,4 +7,8 @@ module Whatup
   # Whatup-specific error class
   class Error < StandardError
   end
+
+  def self.root
+    Dir.pwd
+  end
 end

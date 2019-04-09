@@ -16,3 +16,6 @@ vagrant/*
 
 # Since this is a gem, don't include the lock file
 Gemfile.lock
+
+# Ignore the database
+db/*.db

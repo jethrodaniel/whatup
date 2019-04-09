@@ -1,17 +1,14 @@
 # frozen_string_literal: true
 
+require 'whatup/server/models/application_record'
+
 module Whatup
   module Server
-    class Client
-      attr_reader :id, :name
-      attr_accessor *%i[socket room]
+    class Client < ApplicationRecord
+      has_many :messages
+      belongs_to :room, optional: true
 
-      def initialize id:, name:, socket:
-        @id = id
-        @name = name
-        @socket = socket
-        @room = nil
-      end
+      attr_accessor *%i[socket]
 
       def puts msg
         socket.puts msg
@@ -26,10 +23,9 @@ module Whatup
         msg.chomp
       end
 
-      def room?
-        !room.nil?
+      def chatting?
+        !room_id.nil?
       end
-      alias chatting? room?
 
       def status
         "#{name}" \
@@ -37,14 +33,12 @@ module Whatup
       end
 
       def broadcast msg
-        @room.clients.reject { |c| c == self }
-             .each { |c| c.puts "#{name}> #{msg}" }
+        room.broadcast(except: self) { "#{name}> #{msg}" }
       end
 
       def leave_room!
         broadcast 'LEFT'
         room.drop_client! self
-        @room = nil
       end
 
       def exit!
