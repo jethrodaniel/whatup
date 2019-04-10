@@ -136,9 +136,11 @@ module Whatup
           end
           msg.puts input
         end
-        client.composing_dm.messages << Message.new(
-          content: msg.string
-        )
+        client.composing_dm
+              .received_messages << Message.new(
+                sender: client,
+                content: msg.string
+              )
         client.composing_dm = nil
       end
 
@@ -182,7 +184,13 @@ module Whatup
         )
 
         puts "#{client.name} just showed up!"
-        client.puts "Hello, #{client.name}!"
+        client.puts <<~MSG
+          Hello, #{client.name}!
+
+          Welcome to whatup.
+
+          To get started, type `help`.
+        MSG
         client
       end
 

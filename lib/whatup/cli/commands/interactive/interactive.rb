@@ -107,9 +107,14 @@ module Whatup
       desc 'dmlist', 'List your received messages'
       def dmlist
         say 'Your direct messages:'
-        @current_user.messages.each do |msg|
-          say msg.content
-        end
+        msgs = @current_user.received_messages.map do |msg|
+          <<~MSG
+            From: #{msg.sender.name}
+
+            #{msg.content}
+          MSG
+        end.join('-' * 10)
+        say msgs
       end
 
       desc 'dm [NAME]', 'Send a direct message to [NAME]'

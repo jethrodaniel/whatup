@@ -5,10 +5,14 @@ require 'whatup/server/models/application_record'
 module Whatup
   module Server
     class Client < ApplicationRecord
-      has_many :messages
+      has_many :sent_messages, class_name: 'Message',
+                               foreign_key: 'sender_id'
+      has_many :received_messages, class_name: 'Message',
+                                   foreign_key: 'recipient_id'
+
       belongs_to :room, optional: true
 
-      validates :name, uniqueness: true
+      validates_uniqueness_of :name
 
       attr_accessor *%i[socket composing_dm deleted]
 

@@ -36,11 +36,15 @@ RSpec.describe 'whatup', type: :aruba do
 
   context 'when first connecting to the server' do
     let(:output) do
-      <<~OUTPUT.gsub /^\s+/, ''
+      <<~OUTPUT
         Connecting to localhost:9001 ...
         ~> zeus
         ~> Please enter your username to establish a connection...
         Hello, zeus!
+
+        Welcome to whatup.
+
+        To get started, type `help`.
         Exiting ...
       OUTPUT
     end
@@ -61,6 +65,10 @@ RSpec.describe 'whatup', type: :aruba do
           ~> help
           ~> Please enter your username to establish a connection...
           Hello, zeus!
+
+          Welcome to whatup.
+
+          To get started, type `help`.
           Commands:
             dm [NAME]       # Send a direct message to [NAME]
             dmlist          # List your received messages
@@ -89,6 +97,10 @@ RSpec.describe 'whatup', type: :aruba do
           ~> list
           ~> Please enter your username to establish a connection...
           Hello, zeus!
+
+          Welcome to whatup.
+
+          To get started, type `help`.
           All connected clients:
           * zeus
           Exiting ...

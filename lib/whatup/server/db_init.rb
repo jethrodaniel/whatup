@@ -36,7 +36,8 @@ module Whatup
             end
             create_table :messages, force: true do |t|
               t.string :content
-              t.references :client
+              t.references :sender
+              t.references :recipient
             end
             create_table :rooms, force: true do |t|
               t.string :name
