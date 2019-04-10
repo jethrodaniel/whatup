@@ -11,7 +11,7 @@ module Whatup
       class << self
         # Sets up our database, deleting all existing data.
         def setup_db!
-          db = "#{Whatup.root}/db/whatup.db"
+          db = "#{Dir.home}/.whatup.db"
           SQLite3::Database.new(db) unless File.exist?(db)
 
           ActiveRecord::Base.establish_connection adapter: 'sqlite3',
