@@ -70,7 +70,7 @@ RSpec.describe 'whatup', type: :aruba do
 
           To get started, type `help`.
           Commands:
-            dm [NAME]       # Send a direct message to [NAME]
+            dm ...          # Perform direct message commands
             dmlist          # List your received messages
             exit            # Closes your connection with the server
             help [COMMAND]  # Describe available commands or one specific command

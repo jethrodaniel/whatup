@@ -199,15 +199,15 @@ module Whatup
         # and then set any instance variables, since Thor will create a new
         # class instance when it's invoked.
         cmds, opts = Whatup::CLI::Interactive.parse_input msg
-        Whatup::CLI::Interactive.new(cmds, opts).tap do |c|
-          c.server = self
-          c.current_user = client
-
-          # This _should_ achieve the same effect as
-          # `Whatup::CLI::Interactive.start(args)`, but allows us to set
-          # instance variables on the cli class.
-          c.invoke c.args.first, c.args.drop(1)
-        end
+        cli = Whatup::CLI::Interactive.new(
+          cmds,
+          opts,
+          config = {locals: {server: self, current_user: client}}
+        )
+        # This achieve the same effect as
+        # `Whatup::CLI::Interactive.start(args)`, but allows us to set
+        # instance variables on the cli class.
+        cli = cli.invoke cli.args.first, cli.args.drop(1)
       end
 
       def exit_if_pid_exists!

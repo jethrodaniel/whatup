@@ -1,28 +1,18 @@
 # frozen_string_literal: true
 
 require 'thor'
+require 'whatup/cli/thor_interactive'
 
 require 'whatup/client/client'
+require 'whatup/cli/commands/interactive/dm'
 
 module Whatup
   module CLI
-    # Any methods of class `Whatup::CLI::Interactive` that rely on instance
-    # variables should be included here
-    COMMANDS = %i[
-      room
-      list
-      exit
-      dmlist
-      dm
-    ].freeze
-
-    require 'whatup/cli/commands/interactive/setup'
-
     # Interactive client commands that are available after connecting
     #
     # This class is run on the server
     class Interactive < Thor
-      prepend InteractiveSetup
+      extend ThorInteractive
 
       Room = Whatup::Server::Room
       Client = Whatup::Server::Client
@@ -48,8 +38,6 @@ module Whatup
           cmds = cmds&.split(/\s+/)
           opts = opts&.split(/\s+/)
 
-          # `Whatup::CLI::Interactive.new(cmds, opts)` expects arrays, and
-          # a final options hash
           cmds = [] if cmds.nil?
           opts = [] if opts.nil?
 
@@ -57,23 +45,17 @@ module Whatup
         end
       end
 
-      # Don't show app name in command help, i.e, instead of
-      # `app command desc`, use `command desc`
-      def self.banner task, _namespace = false, subcommand = false
-        task.formatted_usage(self, false, subcommand).to_s
-      end
-
       desc 'list', 'Show all connected clients'
       def list
         say 'All connected clients:'
-        @server.clients_except(@current_user).each { |c| say "  #{c.status}" }
-        say "* #{@current_user.status}"
+        local(:server).clients_except(local(:current_user)).each { |c| say "  #{c.status}" }
+        say "* #{local(:current_user).status}"
       end
 
       desc 'room [NAME]', 'Create and enter chatroom [NAME]'
       def room name
         if room = Room.find_by(name: name)
-          @current_user.puts <<~MSG
+          local(:current_user).puts <<~MSG
             Entering #{room.name}... enjoy your stay!
 
             Type `.exit` to exit this chat room.
@@ -83,21 +65,21 @@ module Whatup
                 "- #{client.name}\n"
               end.join}
           MSG
-          @current_user.update! room: room
+          local(:current_user).update! room: room
 
-          room.broadcast except: @current_user do
+          room.broadcast except: local(:current_user) do
             <<~MSG
-              #{@current_user.name} has arrived! Play nice, kids.
+              #{local(:current_user).name} has arrived! Play nice, kids.
             MSG
           end
 
-          room.clients << @current_user
+          room.clients << local(:current_user)
           return
         end
 
-        room = @server.new_room! name: name, clients: [@current_user]
+        room = local(:server).new_room! name: name, clients: [local(:current_user)]
 
-        @current_user.puts <<~MSG
+        local(:current_user).puts <<~MSG
           Created and entered #{room.name}... invite some people or something!
 
           Type `.exit` to exit this chat room.
@@ -107,7 +89,7 @@ module Whatup
       desc 'dmlist', 'List your received messages'
       def dmlist
         say 'Your direct messages:'
-        msgs = @current_user.received_messages.map do |msg|
+        msgs = local(:current_user).received_messages.map do |msg|
           <<~MSG
             From: #{msg.sender.name}
 
@@ -127,7 +109,7 @@ module Whatup
 
             Type `.exit` when you're ready to send it.
           MSG
-          @current_user.composing_dm = recepient
+          local(:current_user).composing_dm = recepient
           return
         end
 
@@ -136,8 +118,14 @@ module Whatup
 
       desc 'exit', 'Closes your connection with the server'
       def exit
-        @current_user.exit!
+        local(:current_user).exit!
       end
+
+      desc 'dm ...', 'Perform direct message commands'
+      long_desc <<~DESC
+        Perform direct message commands.
+      DESC
+      subcommand 'dm', Dm
     end
   end
 end
