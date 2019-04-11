@@ -17,7 +17,7 @@ module Whatup
       attr_accessor *%i[socket composing_dm deleted]
 
       def puts msg
-        socket.puts msg
+        socket&.puts(msg)
       end
 
       def gets

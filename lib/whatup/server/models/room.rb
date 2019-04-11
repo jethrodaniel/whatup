@@ -18,7 +18,7 @@ module Whatup
           clients.where.not id: except.id
         else
           clients
-        end.each { |c| c.puts yield }
+        end.each { |c| c&.puts(yield) }
       end
     end
   end
