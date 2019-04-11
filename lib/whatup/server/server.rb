@@ -26,6 +26,10 @@ module Whatup
 
       attr_reader *%i[ip port address clients pid pid_file rooms]
 
+      # @param ip [String] The ip address to run the server on
+      # @param port [Integer] The port to run the server on
+      #
+      # @return [Whatup::Server::Server] The created server
       def initialize ip: 'localhost', port:
         @ip = ip
         @port = port
@@ -53,26 +57,24 @@ module Whatup
 
         # Listen for connections, then accept each in a separate thread
         loop do
-          Thread.new(@socket.accept) do |client|
-            case handle_client client
-            when :exit
-              client.puts 'bye!'
-              Thread.kill Thread.current
-            end
-          end
+          Thread.new(@socket.accept) { |client| handle_client client }
         end
       rescue SignalException # In case of ^c
         kill
       end
 
-      def find_client_by name:
-        @clients.select { |c| c.name == name }&.first
-      end
-
+      # @param client [Whatup::Server::Client] The client to not retrieve
+      #
+      # @return [Array<Whatup::Server::Client>] All currently connected clients
+      #   except for `client`
       def clients_except client
         @clients.reject { |c| c == client }
       end
 
+      # @param clients [Array<Whatup::Server::Client>] Room's inital clients
+      # @param name [String] The room's name
+      #
+      # @return [Whatup::Server::Room] The created room
       def new_room! clients: [], name:
         room = Room.create! name: name, clients: clients
         @rooms << room
@@ -82,6 +84,8 @@ module Whatup
       private
 
       # Receives a new client, then continuously gets input from that client
+      #
+      # @param client [Whatup::Server::Client] The client
       #
       # rubocop:disable Metrics/MethodLength
       def handle_client client
@@ -125,6 +129,10 @@ module Whatup
       end
       # rubocop:enable Metrics/MethodLength
 
+      # Handles inputing direct messages
+      #
+      # @param client [Whatup::Server::Client] `client` is the sender of
+      #   the message, and `client.composing_dm` is the recipient.
       def handle_dm client
         msg = StringIO.new
         loop do
@@ -144,6 +152,10 @@ module Whatup
         client.composing_dm = nil
       end
 
+      # Handles chatting.
+      #
+      # @param client [Whatup::Server::Client] The client. `client` is assumed
+      #   to already belong to a room
       def handle_chatting client
         loop do
           input = client.input!
@@ -166,6 +178,10 @@ module Whatup
       # If no username is provided (i.e, blank), it assigns a random, anonymous
       # username in the format `ANON-xxx`, where `xxx` is a random number upto
       # 100, left-padded with zeros.
+      #
+      # @param client [TCPSocket] The client connection
+      #
+      # @return [Whatup::Server::Client] The created client
       def create_new_client_if_not_existing! client
         name     = client.gets.chomp
         rand_num = SecureRandom.random_number(100).to_s.rjust 3, '0'
@@ -194,22 +210,26 @@ module Whatup
         client
       end
 
+      # Initialize a new cli class using the initial command and options,
+      # and then set any instance variables, since Thor will create a new
+      # class instance when it's invoked.
+      #
+      # This achieve the same effect as
+      # `Whatup::CLI::Interactive.start(args)`, but allows us to set
+      # instance variables on the cli class.
+      #
+      # @param client [Whatup::Server::Client]
       def run_thor_command! client:, msg:
-        # Initialize a new cli class using the initial command and options,
-        # and then set any instance variables, since Thor will create a new
-        # class instance when it's invoked.
         cmds, opts = Whatup::CLI::Interactive.parse_input msg
         cli = Whatup::CLI::Interactive.new(
           cmds,
           opts,
-          config = {locals: {server: self, current_user: client}}
+          locals: {server: self, current_user: client} # config
         )
-        # This achieve the same effect as
-        # `Whatup::CLI::Interactive.start(args)`, but allows us to set
-        # instance variables on the cli class.
-        cli = cli.invoke cli.args.first, cli.args.drop(1)
+        cli.invoke cli.args.first, cli.args.drop(1)
       end
 
+      # Kills the server if a PID for this app exists
       def exit_if_pid_exists!
         return unless running?
 
@@ -221,21 +241,26 @@ module Whatup
         kill
       end
 
+      # Connect a new socket for this server to start listening on the specified
+      # address and port.
       def connect_to_socket!
-        @socket = TCPServer.open @port
+        @socket = TCPServer.open @ip, @port
       rescue Errno::EADDRINUSE
         puts 'Address already in use!'
         kill
       end
 
+      # Write this process's PID to the PID file
       def write_pid!
         File.open(@pid_file, 'w') { |f| f.puts Process.pid }
       end
 
+      # @return [Bool] Whether or not a PID for this app exists
       def running?
         File.file? @pid_file
       end
 
+      # Kills the server and removes the PID file
       def kill
         say "Killing the server with PID:#{Process.pid} ...", :red
         FileUtils.rm_rf @pid_file

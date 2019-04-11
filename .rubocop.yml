@@ -3,6 +3,10 @@
 AllCops:
   TargetRubyVersion: 2.4 # Modern Ruby
 
+# !!defined?(RSpec)
+Style/DoubleNegation:
+  Enabled: false
+
 # attr_reader *%i[a b c]
 Lint/UnneededSplatExpansion:
   Enabled: false
@@ -14,6 +18,15 @@ Style/GlobalVars:
 
 # Aruba uses modifiable strings
 Style/FrozenStringLiteralComment:
+  Exclude:
+    - 'spec/system_spec.rb'
+
+# For long specs.
+#
+# describe 'some spec'
+#   ...
+# end # describe 'some spec'
+Style/CommentedKeyword:
   Exclude:
     - 'spec/system_spec.rb'
 

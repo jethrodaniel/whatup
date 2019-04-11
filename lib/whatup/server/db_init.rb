@@ -9,6 +9,7 @@ module Whatup
       extend Redirection
 
       class << self
+        # Sets up our database, deleting all existing data.
         def setup_db!
           db = "#{Whatup.root}/db/whatup.db"
           SQLite3::Database.new(db) unless File.exist?(db)
@@ -23,7 +24,13 @@ module Whatup
             DROP TABLE IF EXISTS rooms;
           SQL
 
-          redirect(stdout: StringIO.new) { create_tables! }
+          if Whatup.testing?
+            # We silence output here, so that tests don't get cluttered
+            redirect(stdout: StringIO.new) { create_tables! }
+            return
+          end
+
+          create_tables!
         end
 
         private

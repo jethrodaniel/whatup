@@ -54,7 +54,7 @@ RSpec.describe 'whatup', type: :aruba do
       sleep 0.5
       expect(last_command_stopped.output).to eq output
     end
-  end
+  end # context 'when first connecting to the server'
 
   context 'after connecting to the server' do
     describe 'help' do
@@ -71,7 +71,6 @@ RSpec.describe 'whatup', type: :aruba do
           To get started, type `help`.
           Commands:
             dm ...          # Perform direct message commands
-            dmlist          # List your received messages
             exit            # Closes your connection with the server
             help [COMMAND]  # Describe available commands or one specific command
             list            # Show all connected clients
@@ -87,7 +86,7 @@ RSpec.describe 'whatup', type: :aruba do
         sleep 0.5
         expect(last_command_stopped.output).to eq output
       end
-    end
+    end # context 'after connecting to the server'
 
     describe 'list' do
       let(:output) do
@@ -114,6 +113,97 @@ RSpec.describe 'whatup', type: :aruba do
         sleep 0.5
         expect(last_command_stopped.output).to eq output
       end
-    end
-  end
+    end # describe 'list'
+
+    describe 'dm' do
+      let(:output) do
+        <<~OUTPUT
+          Connecting to localhost:9001 ...
+          ~> zeus
+          ~> dm
+          ~> Please enter your username to establish a connection...
+          Hello, zeus!
+
+          Welcome to whatup.
+
+          To get started, type `help`.
+          Commands:
+            dm help [COMMAND]  # Describe subcommands or one specific subcommand
+            dm list            # List your received messages
+            dm msg [NAME]      # Send a message to [NAME]
+
+          Exiting ...
+        OUTPUT
+      end
+
+      it 'shows dm help' do
+        type 'zeus'
+        type 'dm'
+        sleep 0.5
+        expect(last_command_stopped.output).to eq output
+      end
+    end # describe 'dm'
+
+    describe 'room' do
+      context 'creating a room' do
+        let(:output) do
+          <<~OUTPUT
+            Connecting to localhost:9001 ...
+            ~> zeus
+            ~> room muchwow
+            ~> Please enter your username to establish a connection...
+            Hello, zeus!
+
+            Welcome to whatup.
+
+            To get started, type `help`.
+            Created and entered muchwow... invite some people or something!
+
+            Type `.exit` to exit this chat room.
+            Exiting ...
+          OUTPUT
+        end
+
+        it 'starts chatting in a new chatroom' do
+          type 'zeus'
+          sleep 0.5
+          type 'room muchwow'
+          sleep 0.5
+          expect(last_command_stopped.output).to eq output
+        end
+      end # context 'creating a room'
+
+      context 'exiting a room' do
+        let(:output) do
+          <<~OUTPUT
+            Connecting to localhost:9001 ...
+            ~> zeus
+            ~> room muchwow
+            ~> .exit
+            ~> Please enter your username to establish a connection...
+            Hello, zeus!
+
+            Welcome to whatup.
+
+            To get started, type `help`.
+            Created and entered muchwow... invite some people or something!
+
+            Type `.exit` to exit this chat room.
+            Exited `muchwow`.
+            Exiting ...
+          OUTPUT
+        end
+
+        it 'stops chatting upon receiving .exit' do
+          type 'zeus'
+          sleep 0.5
+          type 'room muchwow'
+          sleep 0.5
+          type '.exit'
+          sleep 0.5
+          expect(last_command_stopped.output).to include_output_string output
+        end
+      end # context 'exiting a room'
+    end # describe 'room'
+  end # context 'after connecting to the server'
 end

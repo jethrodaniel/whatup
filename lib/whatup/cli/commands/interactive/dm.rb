@@ -9,6 +9,9 @@ module Whatup
     class Dm < Thor
       extend ThorInteractive
 
+      Room = Whatup::Server::Room
+      Client = Whatup::Server::Client
+
       desc 'msg [NAME]', 'Send a message to [NAME]'
       def msg name
         if recepient = Client.find_by(name: name)
@@ -19,7 +22,7 @@ module Whatup
 
             Type `.exit` when you're ready to send it.
           MSG
-          local(:current_user).composing_dm = recepient
+          current_user.composing_dm = recepient
           return
         end
 
@@ -29,7 +32,7 @@ module Whatup
       desc 'list', 'List your received messages'
       def list
         say 'Your direct messages:'
-        msgs = local(:current_user).received_messages.map do |msg|
+        msgs = current_user.received_messages.map do |msg|
           <<~MSG
             From: #{msg.sender.name}
 
