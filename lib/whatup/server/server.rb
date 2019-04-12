@@ -138,11 +138,11 @@ module Whatup
         loop do
           input = client.input!
           puts "#{client.name}> #{input}"
+          msg.puts input
           if input == '.exit'
             client.puts "Finished dm to `#{client.composing_dm.name}`."
             break
           end
-          msg.puts input
         end
         client.composing_dm
               .received_messages << Message.new(
