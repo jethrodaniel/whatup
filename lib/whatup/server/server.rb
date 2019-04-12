@@ -159,16 +159,18 @@ module Whatup
       def handle_chatting client
         loop do
           input = client.input!
-          room = client.room
+          audience = @clients.reject { |c| c.id == client.id }
+                             .select do |c|
+                               client.room.clients.pluck(:id).include? c.id
+                             end
           puts "#{client.name}> #{input}"
           if input == '.exit'
+            client.puts "Exited `#{client.room.name}`."
+            audience.each { |c| c.puts "#{client.name}> LEFT" }
             client.leave_room!
-            client.puts "Exited `#{room.name}`."
             break
           end
-          room.broadcast except: client do
-            "#{client.name}> #{input}"
-          end
+          audience.each { |c| c.puts "#{client.name}> #{input}" }
         end
       end
 

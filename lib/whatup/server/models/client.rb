@@ -46,7 +46,6 @@ module Whatup
       end
 
       def leave_room!
-        broadcast 'LEFT'
         room.drop_client! self
       end
 

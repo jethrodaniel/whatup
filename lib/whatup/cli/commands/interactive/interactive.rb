@@ -51,7 +51,7 @@ module Whatup
       end
 
       desc 'room [NAME]', 'Create and enter chatroom [NAME]'
-      def room name
+      def room name # rubocop:disable Metrics/AbcSize
         if room = Room.find_by(name: name)
           current_user.puts <<~MSG
             Entering #{room.name}... enjoy your stay!
@@ -65,8 +65,8 @@ module Whatup
           MSG
           current_user.update! room: room
 
-          room.broadcast except: current_user do
-            <<~MSG
+          server.clients.reject { |c| c.id == current_user.id }.each do |c|
+            c.puts <<~MSG
               #{current_user.name} has arrived! Play nice, kids.
             MSG
           end
