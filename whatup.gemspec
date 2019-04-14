@@ -67,7 +67,8 @@ Gem::Specification.new do |spec|
     'activesupport' => '~> 5.2',
     'thor'          => '~> 0.20.3',
     'sqlite3'       => '~> 1.4',
-    'activerecord'  => '~> 5.2'
+    'activerecord'  => '~> 5.2',
+    'tzinfo'        => '~> 1.2'
   }.each do |gem, version|
     spec.add_dependency gem, version
   end
