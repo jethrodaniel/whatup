@@ -7,6 +7,16 @@ module Whatup
     class Message < ApplicationRecord
       belongs_to :recipient, class_name: 'Client'
       belongs_to :sender, class_name: 'Client', foreign_key: 'sender_id'
+
+      def to_s
+        <<~MSG.gsub '.exit', ''
+          From: #{sender.name}
+          To: #{recipient.name}
+          Date: #{created_at.to_s :db}
+
+          #{content}
+        MSG
+      end
     end
   end
 end

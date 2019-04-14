@@ -40,14 +40,17 @@ module Whatup
             create_table :clients, force: true do |t|
               t.string :name
               t.references :room
+              t.timestamps
             end
             create_table :messages, force: true do |t|
               t.string :content
               t.references :sender
               t.references :recipient
+              t.timestamps
             end
             create_table :rooms, force: true do |t|
               t.string :name
+              t.timestamps
             end
           end
         end

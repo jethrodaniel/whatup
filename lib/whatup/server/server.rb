@@ -145,7 +145,7 @@ module Whatup
           end
         end
         client.composing_dm
-              .received_messages << Message.new(
+              .received_messages << Message.create!(
                 sender: client,
                 content: msg.string
               )

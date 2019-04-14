@@ -10,6 +10,7 @@ module Whatup
       extend ThorInteractive
 
       Room = Whatup::Server::Room
+      Message = Whatup::Server::Message
       Client = Whatup::Server::Client
 
       desc 'msg [NAME]', 'Send a message to [NAME]'
@@ -29,17 +30,14 @@ module Whatup
         say "That user doesn't exist!"
       end
 
-      desc 'list', 'List your received messages'
+      desc 'list', 'List your direct messages'
       def list
         say 'Your direct messages:'
-        msgs = current_user.received_messages.map do |msg|
-          <<~MSG
-            From: #{msg.sender.name}
-
-            #{msg.content}
-          MSG
-        end.join('-' * 10)
-        say msgs
+        say \
+          Message.where(sender: current_user)
+          .or(Message.where(recipient: current_user))
+          .map(&:to_s)
+                 .join('-' * 10)
       end
     end
   end

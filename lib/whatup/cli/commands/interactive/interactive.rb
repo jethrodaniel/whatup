@@ -84,23 +84,6 @@ module Whatup
         MSG
       end
 
-      desc 'dm [NAME]', 'Send a direct message to [NAME]'
-      def dm name
-        if recepient = Client.find_by(name: name)
-          say <<~MSG
-            Sending a direct message to #{name}...
-
-            The message can span multiple lines.
-
-            Type `.exit` when you're ready to send it.
-          MSG
-          current_user.composing_dm = recepient
-          return
-        end
-
-        say "That user doesn't exist!"
-      end
-
       desc 'exit', 'Closes your connection with the server'
       def exit
         current_user.exit!
