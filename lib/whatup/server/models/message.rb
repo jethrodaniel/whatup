@@ -19,8 +19,7 @@ module Whatup
           To: #{recipient.name}
           Date: #{TZ.utc_to_local(created_at).to_s :db}
 
-          #{content}
-
+          #{content&.chomp}
           ------------------------------------------------------------
         MSG
       end

@@ -68,7 +68,8 @@ Gem::Specification.new do |spec|
     'thor'          => '~> 0.20.3',
     'sqlite3'       => '~> 1.4',
     'activerecord'  => '~> 5.2',
-    'tzinfo'        => '~> 1.2'
+    'tzinfo'        => '~> 1.2',
+    'colorize'      => '~> 0.8.1'
   }.each do |gem, version|
     spec.add_dependency gem, version
   end

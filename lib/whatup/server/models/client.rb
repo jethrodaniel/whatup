@@ -21,7 +21,7 @@ module Whatup
       end
 
       def gets
-        socket.gets
+        socket&.gets
       end
 
       def input!
@@ -54,6 +54,10 @@ module Whatup
         socket.close
         @deleted = true
         destroy!
+      end
+
+      def to_s
+        name
       end
     end
   end

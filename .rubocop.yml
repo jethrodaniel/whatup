@@ -32,7 +32,7 @@ Style/CommentedKeyword:
 
 # The default is a bit restrictive
 Metrics/AbcSize:
-  Max: 30
+  Max: 40
 
 # The default is a bit restrictive
 Metrics/ClassLength:
@@ -43,12 +43,13 @@ Lint/AmbiguousRegexpLiteral:
   Enabled: false
 
 Metrics/BlockLength:
+  Max: 30
   Exclude:
     - 'whatup.gemspec'
     - 'spec/**/*_spec.rb'
 
 Metrics/MethodLength:
-  Max: 20 # 10 is a bit too low
+  Max: 30 # 10 is a bit too low
 
 # Don't type unneccesary ()
 Style/MethodDefParentheses:

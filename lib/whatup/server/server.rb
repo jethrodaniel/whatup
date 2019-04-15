@@ -9,6 +9,7 @@ require 'active_record'
 require 'active_support/core_ext/object/blank'
 
 require 'whatup/server/db_init'
+require 'whatup/server/logger'
 require 'whatup/server/redirection'
 require 'whatup/server/models/client'
 require 'whatup/server/models/message'
@@ -18,9 +19,9 @@ require 'whatup/cli/commands/interactive/interactive'
 module Whatup
   module Server
     class Server # rubocop:disable Metrics/ClassLength
-      include Thor::Shell
       include DbInit
       include Redirection
+      include WhatupLogger
 
       Client = Whatup::Server::Client
 
@@ -49,7 +50,7 @@ module Whatup
       # The server continuously loops, and handle each new client in a separate
       # thread.
       def start
-        say "Starting a server with PID:#{@pid} @ #{@address} ... \n", :green
+        log.info { "Starting a server with PID:#{@pid} @ #{@address} ... \n" }
 
         exit_if_pid_exists!
         connect_to_socket!
@@ -57,7 +58,10 @@ module Whatup
 
         # Listen for connections, then accept each in a separate thread
         loop do
-          Thread.new(@socket.accept) { |client| handle_client client }
+          Thread.new(@socket.accept) do |client|
+            log.info { "Accepted new client: #{client.inspect}" }
+            handle_client client
+          end
         end
       rescue SignalException # In case of ^c
         kill
@@ -76,9 +80,9 @@ module Whatup
       #
       # @return [Whatup::Server::Room] The created room
       def new_room! clients: [], name:
-        room = Room.create! name: name, clients: clients
-        @rooms << room
-        room
+        Room.create!(name: name, clients: clients).tap do |room|
+          @rooms << room
+        end
       end
 
       private
@@ -95,7 +99,12 @@ module Whatup
         loop do
           @clients.reject! &:deleted
 
-          Thread.current.exit if client.deleted
+          if client.deleted
+            log.debug do
+              "Client `#{client.name}` has been deleted. Killing this thread."
+            end
+            Thread.current.exit
+          end
 
           if client.composing_dm?
             handle_dm client
@@ -106,8 +115,7 @@ module Whatup
           # Wait until we get a valid command. This takes as long as the client
           # takes.
           msg = client.input! unless Whatup::CLI::Interactive.command?(msg)
-
-          puts "#{client.name}> #{msg}"
+          log.info { "#{client.name.colorize :light_blue}> #{msg}" }
 
           begin
             # Send the output to the client
@@ -118,10 +126,10 @@ module Whatup
           rescue RuntimeError,
                  Thor::InvocationError,
                  Thor::UndefinedCommandError => e
-            puts e.message
+            log.info { "#{client.name.colorize :red}> #{e.message}" }
             client.puts 'Invalid input or unknown command'
           rescue ArgumentError => e
-            puts e.message
+            log.info { "#{client.name.colorize :red}> #{e.message}" }
             client.puts e.message
           end
           msg = nil
@@ -137,18 +145,20 @@ module Whatup
         msg = StringIO.new
         loop do
           input = client.input!
-          puts "#{client.name}> #{input}"
+          log.info { "#{client.name.colorize :light_blue}> #{input}" }
           msg.puts input
           if input == '.exit'
             client.puts "Finished dm to `#{client.composing_dm.name}`."
             break
           end
         end
-        client.composing_dm
-              .received_messages << Message.create!(
-                sender: client,
-                content: msg.string
-              )
+        Message.create!(sender: client, content: msg.string).tap do |m|
+          client.composing_dm.received_messages << m
+          log.debug do
+            "Created new message (id = #{m.id}) from `#{client}` to" \
+            "`#{client.composing_dm}`"
+          end
+        end
         client.composing_dm = nil
       end
 
@@ -163,7 +173,7 @@ module Whatup
                              .select do |c|
                                client.room.clients.pluck(:id).include? c.id
                              end
-          puts "#{client.name}> #{input}"
+          log.info { "#{client.name.colorize :light_blue}> #{input}" }
           if input == '.exit'
             client.puts "Exited `#{client.room.name}`."
             audience.each { |c| c.puts "#{client.name}> LEFT" }
@@ -185,7 +195,17 @@ module Whatup
       #
       # @return [Whatup::Server::Client] The created client
       def create_new_client_if_not_existing! client
-        name     = client.gets.chomp
+        log.debug { 'Creating new client' }
+
+        name = client.gets&.chomp
+
+        if name.nil?
+          log.debug do
+            'New client (currently unknown) has left. Killing this thread'
+          end
+          Thread.current.exit
+        end
+
         rand_num = SecureRandom.random_number(100).to_s.rjust 3, '0'
         name     = name == '' ? "ANON-#{rand_num}" : name
 
@@ -193,6 +213,7 @@ module Whatup
           client.puts 'That name is taken! Goodbye.'
           client.puts 'END'
           client.close
+          log.debug { "Existing name `#{name}` entered. Killing this thread" }
           Thread.current.exit
         end
 
@@ -200,16 +221,17 @@ module Whatup
           name: name,
           socket: client
         )
+        log.info { "Created new client `#{name}` ..." }
 
-        puts "#{client.name} just showed up!"
-        client.puts <<~MSG
-          Hello, #{client.name}!
+        client.tap do |c|
+          c.puts <<~MSG
+            Hello, #{client.name}!
 
-          Welcome to whatup.
+            Welcome to whatup.
 
-          To get started, type `help`.
-        MSG
-        client
+            To get started, type `help`.
+          MSG
+        end
       end
 
       # Initialize a new cli class using the initial command and options,
@@ -233,6 +255,8 @@ module Whatup
 
       # Kills the server if a PID for this app exists
       def exit_if_pid_exists!
+        log.debug { "Checking if `#{@pid}` exists ..." }
+
         return unless running?
 
         say <<~EXIT, :cyan
@@ -246,14 +270,16 @@ module Whatup
       # Connect a new socket for this server to start listening on the specified
       # address and port.
       def connect_to_socket!
+        log.info { "Opening TCP socket at `#{@ip}:#{@port}`" }
         @socket = TCPServer.open @ip, @port
       rescue Errno::EADDRINUSE
-        puts 'Address already in use!'
+        log.error "Address `#{@ip}:#{@port}` is already in use!"
         kill
       end
 
       # Write this process's PID to the PID file
       def write_pid!
+        log.debug { "Writing PID to `#{@pid}`" }
         File.open(@pid_file, 'w') { |f| f.puts Process.pid }
       end
 
@@ -264,8 +290,9 @@ module Whatup
 
       # Kills the server and removes the PID file
       def kill
-        say "Killing the server with PID:#{Process.pid} ...", :red
+        log.info { "Killing the server with PID:#{Process.pid} ..." }
         FileUtils.rm_rf @pid_file
+        log.debug { "Removed `#{@pid_file}`." }
         exit
       end
     end
