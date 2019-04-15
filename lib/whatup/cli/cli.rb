@@ -11,9 +11,15 @@ module Whatup
   module CLI
     # Top-level command class
     class CLI < Thor
-      desc 'hello', 'Says hello'
-      def hello
-        say "Hello!\n", :cyan
+      map %w[-v --version] => :version
+      option :version,
+             aliases: '-v',
+             type: :boolean,
+             desc: 'Show version',
+             default: true
+      desc '-v, --version', 'Outputs the version'
+      def version
+        say Whatup::VERSION
       end
 
       # Subcommands are defined below, but are implemented in `commands/`
