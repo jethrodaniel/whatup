@@ -91,7 +91,6 @@ module Whatup
       #
       # @param client [Whatup::Server::Client] The client
       #
-      # rubocop:disable Metrics/MethodLength
       def handle_client client
         client = create_new_client_if_not_existing! client
 
@@ -101,7 +100,10 @@ module Whatup
 
           if client.deleted
             log.debug do
-              "Client `#{client.name}` has been deleted. Killing this thread."
+              <<~OUT
+                Client `#{client.name}` has been deleted.
+                #{'Killing'.colorize :red} this thread."
+              OUT
             end
             Thread.current.exit
           end
@@ -135,7 +137,6 @@ module Whatup
           msg = nil
         end
       end
-      # rubocop:enable Metrics/MethodLength
 
       # Handles inputing direct messages
       #
@@ -201,7 +202,8 @@ module Whatup
 
         if name.nil?
           log.debug do
-            'New client (currently unknown) has left. Killing this thread'
+            'New client (currently unknown) has left. ' \
+            "#{'Killing'.colorize :red} this thread."
           end
           Thread.current.exit
         end
@@ -213,7 +215,10 @@ module Whatup
           client.puts 'That name is taken! Goodbye.'
           client.puts 'END'
           client.close
-          log.debug { "Existing name `#{name}` entered. Killing this thread" }
+          log.debug do
+            "Existing name `#{name}` entered. " \
+            "#{'Killing'.colorize :red} this thread"
+          end
           Thread.current.exit
         end
 
@@ -259,7 +264,7 @@ module Whatup
 
         return unless running?
 
-        say <<~EXIT, :cyan
+        log.info <<~EXIT
           A server appears to already be running!
           Check `#{@pid_file}`.
         EXIT
@@ -270,7 +275,9 @@ module Whatup
       # Connect a new socket for this server to start listening on the specified
       # address and port.
       def connect_to_socket!
-        log.info { "Opening TCP socket at `#{@ip}:#{@port}`" }
+        log.info do
+          "#{'Opening'.colorize :blue} TCP socket at `#{@ip}:#{@port}`"
+        end
         @socket = TCPServer.open @ip, @port
       rescue Errno::EADDRINUSE
         log.error "Address `#{@ip}:#{@port}` is already in use!"
@@ -290,7 +297,10 @@ module Whatup
 
       # Kills the server and removes the PID file
       def kill
-        log.info { "Killing the server with PID:#{Process.pid} ..." }
+        log.info do
+          "#{'Killing'.colorize :red} the server with " \
+          "PID:#{Process.pid} ..."
+        end
         FileUtils.rm_rf @pid_file
         log.debug { "Removed `#{@pid_file}`." }
         exit

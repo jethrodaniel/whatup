@@ -86,7 +86,7 @@ RSpec.describe 'whatup', type: :aruba do
         sleep 0.5
         expect(last_command_stopped.output).to eq output
       end
-    end # context 'after connecting to the server'
+    end # describe 'help'
 
     describe 'list' do
       let(:output) do

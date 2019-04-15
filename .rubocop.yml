@@ -49,7 +49,7 @@ Metrics/BlockLength:
     - 'spec/**/*_spec.rb'
 
 Metrics/MethodLength:
-  Max: 30 # 10 is a bit too low
+  Max: 40 # 10 is a bit too low
 
 # Don't type unneccesary ()
 Style/MethodDefParentheses:
