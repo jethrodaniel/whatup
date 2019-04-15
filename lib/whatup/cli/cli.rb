@@ -17,7 +17,7 @@ module Whatup
              type: :boolean,
              desc: 'Show version',
              default: true
-      desc '-v, --version', 'Outputs the version'
+      desc '-v, --version', 'Output the version'
       def version
         say Whatup::VERSION
       end

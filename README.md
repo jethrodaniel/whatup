@@ -28,8 +28,8 @@ brief instructions.
 $ whatup
 
 Commands:
+  whatup -v, --version   # Output the version
   whatup client ...      # Perform client commands
-  whatup hello           # Says hello
   whatup help [COMMAND]  # Describe available commands or one specific command
   whatup server ...      # Perform server commands
 ```
