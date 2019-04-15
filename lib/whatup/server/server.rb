@@ -91,7 +91,7 @@ module Whatup
       #
       # @param client [Whatup::Server::Client] The client
       #
-      def handle_client client
+      def handle_client client # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/LineLength
         client = create_new_client_if_not_existing! client
 
         # Loop forever to maintain the connection
@@ -119,20 +119,25 @@ module Whatup
           msg = client.input! unless Whatup::CLI::Interactive.command?(msg)
           log.info { "#{client.name.colorize :light_blue}> #{msg}" }
 
-          begin
-            # Send the output to the client
-            redirect stdin: client.socket, stdout: client.socket do
+          # Send the output to the client
+          redirect stdin: client.socket, stdout: client.socket do
+            begin
               # Invoke the cli using the provided commands and options.
               run_thor_command! client: client, msg: msg
+            rescue RuntimeError,
+                   ArgumentError,
+                   Thor::InvocationError,
+                   Thor::UndefinedCommandError => e
+              log.info do
+                "#{client.name.colorize :red}> #{e.class}: #{e.message}"
+              end
+              client.puts case e.class.to_s
+                          when 'RuntimeError'
+                            'Invalid input or unknown command'
+                          else
+                            e.message
+                          end
             end
-          rescue RuntimeError,
-                 Thor::InvocationError,
-                 Thor::UndefinedCommandError => e
-            log.info { "#{client.name.colorize :red}> #{e.message}" }
-            client.puts 'Invalid input or unknown command'
-          rescue ArgumentError => e
-            log.info { "#{client.name.colorize :red}> #{e.message}" }
-            client.puts e.message
           end
           msg = nil
         end

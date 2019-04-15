@@ -16,7 +16,7 @@ class Logger
               when 'FATAL', 'UNKNOWN' then :red
               end
 
-      "[#{severity.colorize color}][#{time}]: #{msg}\n"
+      "[#{severity.ljust(5, ' ').colorize color}][#{time}]: #{msg}\n"
     end
   end
 end
